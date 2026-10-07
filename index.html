@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <!-- Správne nastavenie viewportu pre všetky mobilné zariadenia -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>GIS Portál: Cyklotrasy a Turistika Okresu Bardejov</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent-bike: #10b981;
+            --accent-hike: #3b82f6;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-radius: 16px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            --shadow-hover: 0 20px 30px -10px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scroll-behavior: smooth;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* HEADER & HERO */
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f766e 100%);
+            color: white;
+            padding: clamp(2.5rem, 6vw, 4.5rem) 1.25rem clamp(2rem, 4vw, 3rem);
+            text-align: center;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: clamp(1.6rem, 4vw, 2.6rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.8rem;
+            line-height: 1.25;
+        }
+
+        header p {
+            font-size: clamp(0.95rem, 2vw, 1.15rem);
+            color: #cbd5e1;
+            max-width: 750px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .author-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        /* RESPONSIVE NAVIGATION */
+        nav {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        .nav-container {
+            max-width: 1250px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1.25rem;
+        }
+
+        .nav-brand {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 0.5rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.6rem 0.9rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        nav a:hover {
+            background: #f1f5f9;
+            color: #0f766e;
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        /* CONTAINER */
+        .container {
+            max-width: 1250px;
+            margin: clamp(1.5rem, 4vw, 2.5rem) auto;
+            padding: 0 1.25rem;
+        }
+
+        .section-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: clamp(1.3rem, 3vw, 1.8rem);
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        /* MAP SECTION */
+        .map-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 1.25rem;
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: clamp(2rem, 5vw, 3.5rem);
+        }
+
+        #map {
+            height: clamp(350px, 50vh, 550px);
+            width: 100%;
+            border-radius: 12px;
+            z-index: 1;
+        }
+
+        .map-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .control-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 1rem;
+            border-radius: 12px;
+        }
+
+        .control-card h4 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #cbd5e1;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-main);
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: #0f766e;
+            background: #f0fdf4;
+        }
+
+        .filter-btn.active {
+            background: #0f766e;
+            color: white;
+            border-color: #0f766e;
+        }
+
+        /* STATS GRID */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(clamp(140px, 45%, 260px), 1fr));
+            gap: 1rem;
+            margin-bottom: clamp(2rem, 5vw, 3.5rem);
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: clamp(1.2rem, 3vw, 1.75rem) 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid #f1f5f9;
+            text-align: center;
+        }
+
+        .stat-card i {
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            color: #0f766e;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card h3 {
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stat-card p {
+            color: var(--text-muted);
+            font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+            font-weight: 500;
+        }
+
+        /* ROUTE CARDS GRID */
+        .routes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(clamp(280px, 100%, 360px), 1fr));
+            gap: 1.5rem;
+            margin-bottom: clamp(2rem, 5vw, 3.5rem);
+        }
+
+        .route-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid #f1f5f9;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .route-header {
+            padding: 1rem 1.25rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .route-header.bike { background: linear-gradient(135deg, #059669, #10b981); }
+        .route-header.hike { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+
+        .route-header h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: rgba(255, 255, 255, 0.25);
+            white-space: nowrap;
+        }
+
+        .route-body {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .route-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+
+        .route-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 0.6rem;
+            text-align: center;
+            margin-bottom: 0.8rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-val {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.85rem;
+            display: block;
+        }
+
+        .stat-lbl {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .route-info-list {
+            font-size: 0.825rem;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        /* PAPER SECTION */
+        .paper-card {
+            background: var(--card-bg);
+            padding: clamp(1.25rem, 4vw, 2.5rem);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid #f1f5f9;
+            margin-bottom: 2rem;
+        }
+
+        .paper-card h3 {
+            font-size: 1.15rem;
+            color: var(--primary);
+            margin: 1.2rem 0 0.5rem;
+        }
+
+        .paper-card h3:first-of-type { margin-top: 0; }
+
+        .paper-card p, .paper-card ul {
+            color: var(--text-muted);
+            font-size: 0.925rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .paper-card ul { padding-left: 1.25rem; }
+
+        /* FOOTER */
+        footer {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 2rem 1.25rem;
+            margin-top: 3rem;
+        }
+
+        footer p {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-top: 0.4rem;
+        }
+
+        /* RESPONSIVE BREAKPOINTS */
+        @media (max-width: 992px) {
+            .map-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-buttons {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            nav a {
+                padding: 0.8rem 1rem;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Cyklistická a Turistická Infraštruktúra Okresu Bardejov</h1>
+        <p>Geoinformatická analýza, interaktívny GIS portál a zber priestorových dát pre SOČ</p>
+        <div class="author-badge">
+            <i class="fa-solid fa-graduation-cap"></i> Autor: SOČ | Odbor 11 - Informatika
+        </div>
+    </header>
+
+    <nav>
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fa-solid fa-map-location-dot"></i> GIS Bardejov
+            </div>
+            <button class="menu-toggle" onclick="toggleMenu()" aria-label="Otvoriť menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#mapa" onclick="closeMenu()"><i class="fa-solid fa-map"></i> Mapa</a></li>
+                <li><a href="#trasy" onclick="closeMenu()"><i class="fa-solid fa-route"></i> Trasy</a></li>
+                <li><a href="#statistiky" onclick="closeMenu()"><i class="fa-solid fa-chart-line"></i> Štatistiky</a></li>
+                <li><a href="#o-praci" onclick="closeMenu()"><i class="fa-solid fa-file-lines"></i> SOČ</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- MAP SECTION -->
+        <section id="mapa">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fa-solid fa-map"></i> Interaktívna Geografická Mapa</h2>
+            </div>
+            <div class="map-wrapper">
+                <div id="map"></div>
+                <div class="map-controls">
+                    <div class="control-card">
+                        <h4><i class="fa-solid fa-filter"></i> Typ Trasy</h4>
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" onclick="filterData('all', this)">
+                                <span>Všetky</span> <i class="fa-solid fa-layer-group"></i>
+                            </button>
+                            <button class="filter-btn" onclick="filterData('bike', this)">
+                                <span>Cyklotrasy</span> <i class="fa-solid fa-person-biking"></i>
+                            </button>
+                            <button class="filter-btn" onclick="filterData('hike', this)">
+                                <span>Turistika</span> <i class="fa-solid fa-person-hiking"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="control-card">
+                        <h4><i class="fa-solid fa-circle-info"></i> Legenda</h4>
+                        <div style="font-size:0.85rem; display:flex; flex-direction:column; gap:0.4rem; color:var(--text-muted);">
+                            <div><span style="display:inline-block; width:12px; height:12px; background:#10b981; border-radius:3px; margin-right:6px;"></span> Cyklotrasy</div>
+                            <div><span style="display:inline-block; width:12px; height:12px; background:#3b82f6; border-radius:3px; margin-right:6px;"></span> Turistické chodníky</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STATS SECTION -->
+        <section id="statistiky">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fa-solid fa-chart-pie"></i> Štatistické Vyhodnotenie</h2>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fa-solid fa-road"></i>
+                    <h3>215 km</h3>
+                    <p>Celková dĺžka trás</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fa-solid fa-mountain-sun"></i>
+                    <h3>1 049 m</h3>
+                    <p>Najvyšší bod (Minčol)</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fa-solid fa-draw-polygon"></i>
+                    <h3>100%</h3>
+                    <p>Vektorizácia QGIS</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fa-solid fa-person-walking-luggage"></i>
+                    <h3>8 Trás</h3>
+                    <p>Spracovaných koridorov</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ROUTES SECTION -->
+        <section id="trasy">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fa-solid fa-compass"></i> Katalóg Trás</h2>
+            </div>
+            <div class="routes-grid" id="routes-container"></div>
+        </section>
+
+        <!-- PAPER DOCUMENTATION -->
+        <section id="o-praci">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fa-solid fa-book-bookmark"></i> Metodika SOČ</h2>
+            </div>
+            <div class="paper-card">
+                <h3>Anotácia a Ciele Práce</h3>
+                <p>
+                    Cieľom tejto Stredoškolskej odbornej činnosti (SOČ) v odbore 11 - Informatika je spracovanie a publikácia dát cyklistickej a turistickej infraštruktúry v okrese Bardejov pomocou geoinformačných systémov.
+                </p>
+
+                <h3>Geoinformatická Metodika</h3>
+                <p>
+                    Dáta boli získané z OpenStreetMap (Overpass API), portálu ZBGIS a vlastných terénnych GPS meraní. Následne boli spracované v aplikácii <strong>QGIS 3.x</strong>.
+                </p>
+                <ul>
+                    <li><strong>Topológia:</strong> Čistenie duplicity a oprava nadväznosti línií.</li>
+                    <li><strong>DMT / DEM:</strong> Výpočet prevýšenia pomocou výškového modelu terénu.</li>
+                    <li><strong>Publikácia:</strong> Konverzia do GeoJSON a zobrazenie cez Leaflet.js.</li>
+                </ul>
+            </div>
+        </section>
+
+    </div>
+
+    <footer>
+        <p><strong>Geoinformatický portál okresu Bardejov</strong></p>
+        <p>&copy; 2026 SOČ Odbor 11 - Informatika | Leaflet.js & QGIS</p>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const dataRoutes = [
+            {
+                id: 1,
+                name: "Bardejov - Bardejovské Kúpele",
+                category: "bike",
+                difficulty: "Ľahká",
+                length: "5.4 km",
+                eleGain: "+85 m",
+                time: "20 min",
+                surface: "Asfaltový povrch",
+                gear: "Mestský / Cestný / Trekking",
+                desc: "Separovaný cyklochodník spájajúci centrum Bardejova s Bardejovskými Kúpeľmi. Vhodný pre rodiny s deťmi.",
+                coords: [
+                    [49.2917, 21.2727],
+                    [49.3080, 21.2820],
+                    [49.3250, 21.2720]
+                ]
+            },
+            {
+                id: 2,
+                name: "Bardejov - Hervartov (UNESCO)",
+                category: "bike",
+                difficulty: "Stredná",
+                length: "11.2 km",
+                eleGain: "+190 m",
+                time: "45 min",
+                surface: "Asfalt / Spevnený štrk",
+                gear: "Trekking / MTB / Gravel",
+                desc: "Trasa k najstaršiemu drevenému kostolíku na Slovensku v obci Hervartov s výhľadmi na Čergov.",
+                coords: [
+                    [49.2917, 21.2727],
+                    [49.2600, 21.2300],
+                    [49.2470, 21.2050]
+                ]
+            },
+            {
+                id: 3,
+                name: "Hervartov - Žobrák (Rozhľadňa)",
+                category: "hike",
+                difficulty: "Náročná",
+                length: "8.5 km",
+                eleGain: "+540 m",
+                time: "2h 45m",
+                surface: "Lesný chodník / Kamene",
+                gear: "Turistická obuv",
+                desc: "Výstup po červenej značke na hrebeň Čergova k dvoch vyhliadkovým rozhľadniam na vrchu Žobrák.",
+                coords: [
+                    [49.2470, 21.2050],
+                    [49.2300, 21.1800],
+                    [49.2150, 21.1450]
+                ]
+            },
+            {
+                id: 4,
+                name: "Okruh Zborovský Hradný Vrch",
+                category: "bike",
+                difficulty: "Stredná",
+                length: "14.5 km",
+                eleGain: "+280 m",
+                time: "1 hod",
+                surface: "Štrková cesta / Lesná cesta",
+                gear: "MTB / Gravel",
+                desc: "Okruh z Bardejova smerom na Zborov a okolo prírodnej rezervácie Zborovský hradný vrch.",
+                coords: [
+                    [49.2917, 21.2727],
+                    [49.3300, 21.3000],
+                    [49.3520, 21.3050]
+                ]
+            },
+            {
+                id: 5,
+                name: "Bardejovské Kúpele - Kamenná Hora",
+                category: "hike",
+                difficulty: "Ľahká",
+                length: "3.8 km",
+                eleGain: "+120 m",
+                time: "1h 10m",
+                surface: "Lesný chodník",
+                gear: "Nízka turistická obuv",
+                desc: "Kyslíkový chodník a odpočinková turistická trasa v okolí kúpeľného lesoparku.",
+                coords: [
+                    [49.3250, 21.2720],
+                    [49.3320, 21.2600],
+                    [49.3380, 21.2500]
+                ]
+            },
+            {
+                id: 6,
+                name: "Cesta hrdinov SNP (Minčol - Zborov)",
+                category: "hike",
+                difficulty: "Náročná",
+                length: "28.0 km",
+                eleGain: "+980 m",
+                time: "8 hod",
+                surface: "Hrebeňový chodník / Les",
+                gear: "Vysoká turistická obuv",
+                desc: "Červená magistrála prechádzajúca najvyššími bodmi Čergovských vrchov až do obce Zborov.",
+                coords: [
+                    [49.2300, 20.9900],
+                    [49.2150, 21.1450],
+                    [49.3520, 21.3050]
+                ]
+            }
+        ];
+
+        // Mapa Init
+        const map = L.map('map').setView([49.2917, 21.2727], 11);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        let activeLayers = [];
+
+        function drawMapRoutes(filter = 'all') {
+            activeLayers.forEach(layer => map.removeLayer(layer));
+            activeLayers = [];
+
+            dataRoutes.forEach(route => {
+                if (filter === 'all' || route.category === filter) {
+                    const color = route.category === 'bike' ? '#10b981' : '#3b82f6';
+                    
+                    const polyline = L.polyline(route.coords, {
+                        color: color,
+                        weight: 5,
+                        opacity: 0.85,
+                        lineJoin: 'round'
+                    }).addTo(map);
+
+                    polyline.bindPopup(`
+                        <div style="font-family:'Plus Jakarta Sans', sans-serif;">
+                            <strong style="font-size:0.95rem; color:#0f172a;">${route.name}</strong><br>
+                            <span style="color:#64748b; font-size:0.85rem;">${route.category === 'bike' ? 'Cyklotrasa' : 'Turistika'}</span><br>
+                            <small><b>Dĺžka:</b> ${route.length} | <b>Stúpanie:</b> ${route.eleGain}</small>
+                        </div>
+                    `);
+
+                    activeLayers.push(polyline);
+                }
+            });
+        }
+
+        function renderCards(filter = 'all') {
+            const container = document.getElementById('routes-container');
+            container.innerHTML = '';
+
+            dataRoutes.forEach(route => {
+                if (filter === 'all' || route.category === filter) {
+                    const isBike = route.category === 'bike';
+                    const card = document.createElement('div');
+                    card.className = 'route-card';
+
+                    card.innerHTML = `
+                        <div class="route-header ${isBike ? 'bike' : 'hike'}">
+                            <h3>${route.name}</h3>
+                            <span class="badge">${route.difficulty}</span>
+                        </div>
+                        <div class="route-body">
+                            <p class="route-desc">${route.desc}</p>
+                            <div class="route-stats">
+                                <div>
+                                    <span class="stat-val">${route.length}</span>
+                                    <span class="stat-lbl">Dĺžka</span>
+                                </div>
+                                <div>
+                                    <span class="stat-val">${route.eleGain}</span>
+                                    <span class="stat-lbl">Stúpanie</span>
+                                </div>
+                                <div>
+                                    <span class="stat-val">${route.time}</span>
+                                    <span class="stat-lbl">Čas</span>
+                                </div>
+                            </div>
+                            <div class="route-info-list">
+                                <div><i class="fa-solid fa-layer-group"></i> <strong>Povrch:</strong> ${route.surface}</div>
+                                <div><i class="fa-solid fa-person-running"></i> <strong>Vybavenie:</strong> ${route.gear}</div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                }
+            });
+        }
+
+        function filterData(type, btnElement) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            
+            drawMapRoutes(type);
+            renderCards(type);
+        }
+
+        function toggleMenu() {
+            document.getElementById('navLinks').classList.toggle('active');
+        }
+
+        function closeMenu() {
+            document.getElementById('navLinks').classList.remove('active');
+        }
+
+        drawMapRoutes();
+        renderCards();
+    </script>
+</body>
+</html>

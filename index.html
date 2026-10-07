@@ -179,10 +179,16 @@
 
         #map { width: 100%; height: 100%; z-index: 1; }
 
+        /* VYNULOVANIE KONTANERA ZNAČKY LEAFLET PRE PRESNÉ POLOHOVANIE */
+        .custom-poi-wrapper {
+            background: transparent !important;
+            border: none !important;
+        }
+
         .poi-pin {
             width: 32px; height: 32px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 13px; box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            color: white; font-size: 13px; box-shadow: 0 3px 8px rgba(0,0,0,0.35);
             border: 2px solid white; transition: transform 0.2s;
         }
         .poi-pin:hover { transform: scale(1.25); z-index: 999; }
@@ -530,6 +536,10 @@
             repair: L.layerGroup().addTo(map)
         };
 
+        function clearPoiGroups() {
+            Object.values(poiGroups).forEach(group => group.clearLayers());
+        }
+
         let mapLayerControl = L.control.layers({}, {}, { position: 'topright' }).addTo(map);
 
         function updateLayerControls() {
@@ -582,7 +592,6 @@
             single: '#f59e0b'
         };
 
-        // OVERPASS ENDPOINTY SO SPRÁVNYMI HEADERMI
         const OVERPASS_ENDPOINTS = [
             "https://overpass-api.de/api/interpreter",
             "https://overpass.kumi.systems/api/interpreter",
@@ -593,28 +602,29 @@
         async function fetchAllGeospatialData() {
             updateStatus('loading');
 
-            // Bounding box pre širšie okolie Bardejova
             const bbox = "49.15,21.10,49.40,21.40";
 
-            // Optimalizovaný a zrýchlený Overpass Query
-            const query = `[out:json][timeout:20];
+            // PRIDANÝ PARAMETER 'center' PRE ZÍSKANIE PRESNÝCH SÚRADNÍC PLOŠNÝCH OBJEKTOV (NWR)
+            const query = `[out:json][timeout:25];
 (
   relation["route"~"bicycle|hiking|mtb"](${bbox});
   way["highway"="cycleway"](${bbox});
-  node["natural"="peak"](${bbox});
-  node["tourism"="viewpoint"](${bbox});
-  node["natural"="spring"](${bbox});
-  node["amenity"="shelter"](${bbox});
-  node["historic"~"castle|ruins"](${bbox});
+  nwr["natural"="peak"](${bbox});
+  nwr["tourism"="viewpoint"](${bbox});
+  nwr["natural"="spring"](${bbox});
+  nwr["amenity"="shelter"](${bbox});
+  nwr["historic"~"castle|ruins"](${bbox});
+  nwr["amenity"="parking"](${bbox});
+  nwr["amenity"="bicycle_repair_station"](${bbox});
 );
-out body geom;`;
+out center body geom;`;
 
             let success = false;
 
             for (const endpoint of OVERPASS_ENDPOINTS) {
                 try {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 7000); // 7 sekúnd max na server
+                    const timeoutId = setTimeout(() => controller.abort(), 7000);
 
                     const res = await fetch(endpoint, {
                         method: "POST",
@@ -662,48 +672,52 @@ out body geom;`;
         function processElements(elements) {
             routesData = [];
             poiDataCount = 0;
+            clearPoiGroups();
             let routeId = 1;
 
             elements.forEach(el => {
                 const tags = el.tags || {};
 
-                // POI
-                if (el.type === 'node') {
-                    const lat = el.lat;
-                    const lon = el.lon;
+                // ZÍSKANIE PRESNÝCH GPS SÚRADNÍC PRE BODOVÉ AJ PLOŠNÉ MIESTA
+                const lat = el.lat || (el.center ? el.center.lat : null);
+                const lon = el.lon || (el.center ? el.center.lon : null);
 
-                    if (lat && lon) {
-                        let poiType = null;
-                        let iconClass = 'fa-location-dot';
-                        let pinClass = 'poi-peak';
+                // AK IDE O MIESTO (POI)
+                if (lat && lon && (tags.natural || tags.tourism || tags.amenity || tags.historic)) {
+                    let poiType = null;
+                    let iconClass = 'fa-location-dot';
+                    let pinClass = 'poi-peak';
 
-                        if (tags.natural === 'peak') { poiType = 'peaks'; iconClass = 'fa-mountain'; pinClass = 'poi-peak'; }
-                        else if (tags.tourism === 'viewpoint') { poiType = 'viewpoints'; iconClass = 'fa-eye'; pinClass = 'poi-viewpoint'; }
-                        else if (tags.natural === 'spring') { poiType = 'springs'; iconClass = 'fa-droplet'; pinClass = 'poi-spring'; }
-                        else if (tags.amenity === 'shelter') { poiType = 'shelters'; iconClass = 'fa-campground'; pinClass = 'poi-shelter'; }
-                        else if (tags.historic) { poiType = 'castles'; iconClass = 'fa-chess-rook'; pinClass = 'poi-castle'; }
+                    if (tags.natural === 'peak') { poiType = 'peaks'; iconClass = 'fa-mountain'; pinClass = 'poi-peak'; }
+                    else if (tags.tourism === 'viewpoint') { poiType = 'viewpoints'; iconClass = 'fa-eye'; pinClass = 'poi-viewpoint'; }
+                    else if (tags.natural === 'spring') { poiType = 'springs'; iconClass = 'fa-droplet'; pinClass = 'poi-spring'; }
+                    else if (tags.amenity === 'shelter') { poiType = 'shelters'; iconClass = 'fa-campground'; pinClass = 'poi-shelter'; }
+                    else if (tags.historic) { poiType = 'castles'; iconClass = 'fa-chess-rook'; pinClass = 'poi-castle'; }
+                    else if (tags.amenity === 'parking') { poiType = 'parking'; iconClass = 'fa-square-p'; pinClass = 'poi-parking'; }
+                    else if (tags.amenity === 'bicycle_repair_station') { poiType = 'repair'; iconClass = 'fa-wrench'; pinClass = 'poi-repair'; }
 
-                        if (poiType && poiGroups[poiType]) {
-                            poiDataCount++;
-                            const name = tags.name || 'Bod záujmu';
-                            const ele = tags.ele ? `<br><b>Nadmorská výška:</b> ${tags.ele} m.n.m.` : '';
+                    if (poiType && poiGroups[poiType]) {
+                        poiDataCount++;
+                        const name = tags.name || tags.ref || 'Bod záujmu';
+                        const ele = tags.ele ? `<br><b>Nadmorská výška:</b> ${tags.ele} m.n.m.` : '';
 
-                            const icon = L.divIcon({
-                                className: 'custom-poi-wrapper',
-                                html: `<div class="poi-pin ${pinClass}"><i class="fa-solid ${iconClass}"></i></div>`,
-                                iconSize: [32, 32], iconAnchor: [16, 16]
-                            });
+                        const icon = L.divIcon({
+                            className: 'custom-poi-wrapper',
+                            html: `<div class="poi-pin ${pinClass}"><i class="fa-solid ${iconClass}"></i></div>`,
+                            iconSize: [32, 32],
+                            iconAnchor: [16, 16]
+                        });
 
-                            const marker = L.marker([lat, lon], { icon: icon }).bindPopup(`
-                                <div class="popup-box">
-                                    <h4>${name}</h4>
-                                    <div class="popup-info">
-                                        <b>Kategória:</b> ${t('poi_' + poiType)}${ele}
-                                    </div>
+                        const marker = L.marker([lat, lon], { icon: icon }).bindPopup(`
+                            <div class="popup-box">
+                                <h4>${name}</h4>
+                                <div class="popup-info">
+                                    <b>Kategória:</b> ${t('poi_' + poiType)}${ele}<br>
+                                    <b>GPS:</b> ${lat.toFixed(5)}, ${lon.toFixed(5)}
                                 </div>
-                            `);
-                            poiGroups[poiType].addLayer(marker);
-                        }
+                            </div>
+                        `);
+                        poiGroups[poiType].addLayer(marker);
                     }
                 }
                 // RELÁCIE TRÁS
@@ -738,7 +752,7 @@ out body geom;`;
                     }
                 }
                 // CYKLOCHODNÍKY (WAY)
-                else if (el.type === 'way' && el.geometry && el.geometry.length > 1) {
+                else if (el.type === 'way' && el.geometry && el.geometry.length > 1 && tags.highway === 'cycleway') {
                     const line = el.geometry.map(pt => [pt.lat, pt.lon]);
                     let totalM = calculateDistance([line]);
                     let km = (totalM / 1000).toFixed(1);
@@ -916,7 +930,7 @@ out body geom;`;
             if (viewId === 'mapView') map.invalidateSize();
         }
 
-        // LOKÁLNA INTEGRUJANÁ DATABÁZA PRE BLESKOVÉ NAČÍTANIE
+        // ZÁKLADNÉ TRASY PRE LOKÁLNY REŽIM
         const localMasterRoutes = [
             { id: "lb1", name: "Cyklochodník Bardejov – Bardejovské Kúpele", category: "bike", lengthKm: "5.2", difficulty: "easy", surface: "asfalt", coords: [[[49.2917, 21.2727], [49.2965, 21.2750], [49.3031, 21.2801], [49.3105, 21.2825], [49.3180, 21.2780], [49.3245, 21.2720]]] },
             { id: "lb2", name: "Cyklotrasa Bardejov – Hervartov (UNESCO)", category: "bike", lengthKm: "10.8", difficulty: "medium", surface: "asfalt", coords: [[[49.2917, 21.2727], [49.2810, 21.2610], [49.2705, 21.2480], [49.2600, 21.2330], [49.2480, 21.2060]]] },
@@ -939,15 +953,28 @@ out body geom;`;
 
         function loadBackupData() {
             routesData = [...localMasterRoutes];
+            clearPoiGroups();
 
+            // ROZŠÍRENÁ LOKÁLNA BÁZA POI SO SKUTOČNÝMI GPS SO ROZPRSTRENÍM PO OKRESE
             const realPois = [
-                { type: 'castles', name: "Radničné námestie Bardejov (UNESCO)", lat: 49.2917, lon: 21.2758, icon: 'fa-chess-rook', cls: 'poi-castle' },
-                { type: 'castles', name: "Zborovský hrad (Ruina)", lat: 49.3522, lon: 21.3075, icon: 'fa-chess-rook', cls: 'poi-castle' },
-                { type: 'springs', name: "Pramene Bardejovské Kúpele (Hlava, Lekársky)", lat: 49.3252, lon: 21.2715, icon: 'fa-droplet', cls: 'poi-spring' },
+                { type: 'castles', name: "Radničné námestie & Bazilika sv. Egídia", lat: 49.2917, lon: 21.2758, icon: 'fa-chess-rook', cls: 'poi-castle' },
+                { type: 'castles', name: "Zborovský hrad (Hradný vrch)", lat: 49.3522, lon: 21.3075, icon: 'fa-chess-rook', cls: 'poi-castle' },
+                { type: 'castles', name: "Drevený kostolík Hervartov (UNESCO)", lat: 49.2480, lon: 21.2060, icon: 'fa-church', cls: 'poi-castle' },
+                { type: 'springs', name: "Pramene Bardejovské Kúpele (Hlavný, Lekársky)", lat: 49.3252, lon: 21.2715, icon: 'fa-droplet', cls: 'poi-spring' },
+                { type: 'springs', name: "Minerálny prameň Cigeľka", lat: 49.4080, lon: 21.1450, icon: 'fa-droplet', cls: 'poi-spring' },
                 { type: 'peaks', name: "Stebnická Magura (900 m n.m.)", lat: 49.3578, lon: 21.2425, icon: 'fa-mountain', cls: 'poi-peak' },
+                { type: 'peaks', name: "Miháľov – Vyhliadkový vrch", lat: 49.2710, lon: 21.2480, icon: 'fa-mountain', cls: 'poi-peak' },
+                { type: 'peaks', name: "Busov (1002 m n.m.)", lat: 49.4210, lon: 21.1630, icon: 'fa-mountain', cls: 'poi-peak' },
                 { type: 'viewpoints', name: "Rozhľadňa Kamenná hora", lat: 49.3081, lon: 21.2589, icon: 'fa-eye', cls: 'poi-viewpoint' },
+                { type: 'viewpoints', name: "Vyhliadka Čerešenka (Cyklostopy)", lat: 49.3280, lon: 21.2730, icon: 'fa-eye', cls: 'poi-viewpoint' },
+                { type: 'viewpoints', name: "Rozhľadňa Zborov", lat: 49.3620, lon: 21.2980, icon: 'fa-eye', cls: 'poi-viewpoint' },
+                { type: 'shelters', name: "Altánok & Prístrešok Ohnisko Kúpele", lat: 49.3290, lon: 21.2780, icon: 'fa-campground', cls: 'poi-shelter' },
+                { type: 'shelters', name: "Turistický prístrešok Sedlo Čerešňa", lat: 49.3450, lon: 21.2520, icon: 'fa-campground', cls: 'poi-shelter' },
                 { type: 'parking', name: "Záchytné parkovisko Bardejovské Kúpele", lat: 49.3228, lon: 21.2702, icon: 'fa-square-p', cls: 'poi-parking' },
-                { type: 'repair', name: "Cykloservis & Stojan Dlhý Rad", lat: 49.2938, lon: 21.2790, icon: 'fa-wrench', cls: 'poi-repair' }
+                { type: 'parking', name: "Parkovisko Športová hala Bardejov", lat: 49.2890, lon: 21.2820, icon: 'fa-square-p', cls: 'poi-parking' },
+                { type: 'parking', name: "Parkovisko pod Zborovským hradom", lat: 49.3560, lon: 21.3150, icon: 'fa-square-p', cls: 'poi-parking' },
+                { type: 'repair', name: "Cykloservis & Stojan Dlhý Rad", lat: 49.2938, lon: 21.2790, icon: 'fa-wrench', cls: 'poi-repair' },
+                { type: 'repair', name: "Samoobslužný cyklostojan Kúpele", lat: 49.3240, lon: 21.2725, icon: 'fa-wrench', cls: 'poi-repair' }
             ];
 
             poiDataCount = realPois.length;
@@ -964,7 +991,7 @@ out body geom;`;
                         <h4>${poi.name}</h4>
                         <div class="popup-info">
                             <b>Kategória:</b> ${t('poi_' + poi.type)}<br>
-                            <b>GPS:</b> ${poi.lat.toFixed(4)}, ${poi.lon.toFixed(4)}
+                            <b>GPS:</b> ${poi.lat.toFixed(5)}, ${poi.lon.toFixed(5)}
                         </div>
                     </div>
                 `);

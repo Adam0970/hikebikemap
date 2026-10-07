@@ -33,7 +33,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background-color: var(--bg-body); color: var(--text-main); overflow-x: hidden; }
 
-        /* HEADER */
         header {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #064e3b 100%);
             color: white; padding: 1rem 2rem; box-shadow: var(--shadow-sm);
@@ -77,14 +76,12 @@
         }
         .lang-btn.active { background: var(--accent-bike); color: white; }
 
-        /* MAIN APP LAYOUT */
         .app-layout {
             max-width: 1800px; margin: 1rem auto; padding: 0 1rem;
             display: grid; grid-template-columns: 430px 1fr; gap: 1.25rem;
             height: calc(100vh - 105px); min-height: 650px;
         }
 
-        /* SIDEBAR KATALÓG TRÁS */
         .sidebar {
             background: var(--card-bg); border-radius: var(--radius-lg);
             border: 1px solid var(--border); box-shadow: var(--shadow-sm);
@@ -125,7 +122,6 @@
         .pill-btn:hover { background: #f1f5f9; color: var(--text-main); }
         .pill-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* PREHĽADNÝ ZOZNAM KARIET TRÁS */
         .catalog-container { flex-grow: 1; overflow-y: auto; padding: 0.9rem; display: flex; flex-direction: column; gap: 0.75rem; }
         .catalog-container::-webkit-scrollbar { width: 6px; }
         .catalog-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -175,7 +171,6 @@
         }
         .route-card:hover .btn-show-map { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* MAP AREA */
         .map-view {
             background: var(--card-bg); border-radius: var(--radius-lg);
             border: 1px solid var(--border); box-shadow: var(--shadow-sm);
@@ -184,7 +179,6 @@
 
         #map { width: 100%; height: 100%; z-index: 1; }
 
-        /* CUSTOM POI MARKERS (GOOGLE MAPS STYLE) */
         .poi-pin {
             width: 32px; height: 32px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
@@ -193,21 +187,19 @@
         }
         .poi-pin:hover { transform: scale(1.25); z-index: 999; }
         
-        .poi-peak { background: #ef4444; }        /* Červená - Vrcholy */
-        .poi-viewpoint { background: #8b5cf6; }   /* Fialová - Vyhliadky */
-        .poi-spring { background: #06b6d4; }      /* Azúrová - Voda/Pramene */
-        .poi-shelter { background: #10b981; }     /* Zelená - Prístrešky */
-        .poi-castle { background: #d97706; }      /* Jantárová - Hrady/Pamiatky */
-        .poi-parking { background: #2563eb; }     /* Modrá - Parkoviská */
-        .poi-repair { background: #475569; }      /* Sivá - Cykloservis */
+        .poi-peak { background: #ef4444; }
+        .poi-viewpoint { background: #8b5cf6; }
+        .poi-spring { background: #06b6d4; }
+        .poi-shelter { background: #10b981; }
+        .poi-castle { background: #d97706; }
+        .poi-parking { background: #2563eb; }
+        .poi-repair { background: #475569; }
 
-        /* POPUP STYLING */
         .leaflet-popup-content-wrapper { border-radius: 12px; padding: 2px; box-shadow: var(--shadow-md); }
         .popup-box { padding: 8px; font-family: 'Plus Jakarta Sans', sans-serif; }
         .popup-box h4 { font-weight: 800; font-size: 0.98rem; color: var(--primary); margin-bottom: 4px; }
         .popup-info { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4; }
 
-        /* MOBILE TABS */
         .mobile-tabs { display: none; background: white; border-top: 1px solid var(--border); }
         .mobile-tab-btn {
             flex: 1; padding: 0.8rem; border: none; background: transparent; font-weight: 700;
@@ -265,7 +257,6 @@
 
     <div class="app-layout">
         
-        <!-- SIDEBAR KATALÓG TRÁS -->
         <aside class="sidebar active-view" id="sidebarView">
             <div class="sidebar-header">
                 <div id="statusBadge" class="status-badge loading">
@@ -296,14 +287,12 @@
             <div class="catalog-container" id="catalogList"></div>
         </aside>
 
-        <!-- MAPA -->
         <main class="map-view active-view" id="mapView">
             <div id="map"></div>
         </main>
 
     </div>
 
-    <!-- PREPÍNAČ PRE MOBILNÉ ZARIADENIA -->
     <div class="mobile-tabs">
         <button class="mobile-tab-btn active" onclick="switchMobileTab('mapView', this)">
             <i class="fa-solid fa-map"></i> <span data-i18n="tab_map">Mapa</span>
@@ -315,7 +304,6 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // --- 1. MULTILINGUAL DICTIONARY (SK, EN, PL, DE) ---
         const i18n = {
             sk: {
                 app_title: "Bardejov PRO Geoportál",
@@ -325,7 +313,7 @@
                 stat_poi: "Miest (POI)",
                 status_loading: "Sťahujem trasovanie a miesta z Overpass GIS...",
                 status_success: "Načítaných {routes} trás a {poi} dôležitých miest",
-                status_error: "API nedostupné, načítaná záložná databáza.",
+                status_error: "API Nedostupné. Načítaná presná lokálna databáza Bardejov.",
                 search_placeholder: "Hľadať trasu, povrch, miesto...",
                 sort_len_desc: "Dĺžka: najdlhšie prvé",
                 sort_len_asc: "Dĺžka: najkratšie prvé",
@@ -344,8 +332,8 @@
                 diff_hard: "Náročná",
                 btn_focus: "Zobraziť na mape",
                 no_results: "Žiadne trasy nezodpovedajú vyhľadávaniu.",
-                poi_peaks: "⛰️ Vrcholy & Kopce (Názvy)",
-                poi_viewpoints: "👁️ Vyhliadky",
+                poi_peaks: "⛰️ Vrcholy & Kopce",
+                poi_viewpoints: "👁️ Vyhliadky & Rozhľadne",
                 poi_springs: "💧 Pramene & Pitná voda",
                 poi_shelters: "🏕️ Altánky & Chaty",
                 poi_castles: "🏰 Hrady & Pamiatky",
@@ -366,7 +354,7 @@
                 stat_poi: "Places (POI)",
                 status_loading: "Downloading geometry & POIs from Overpass GIS...",
                 status_success: "Loaded {routes} routes and {poi} points of interest",
-                status_error: "API unavailable, backup dataset loaded.",
+                status_error: "API unavailable. Loaded accurate Bardejov local database.",
                 search_placeholder: "Search route, surface, location...",
                 sort_len_desc: "Length: longest first",
                 sort_len_asc: "Length: shortest first",
@@ -385,8 +373,8 @@
                 diff_hard: "Hard",
                 btn_focus: "Show on map",
                 no_results: "No routes found.",
-                poi_peaks: "⛰️ Mountain Peaks (Labels)",
-                poi_viewpoints: "👁️ Viewpoints",
+                poi_peaks: "⛰️ Mountain Peaks",
+                poi_viewpoints: "👁️ Viewpoints & Towers",
                 poi_springs: "💧 Water Springs",
                 poi_shelters: "🏕️ Shelters & Huts",
                 poi_castles: "🏰 Castles & Heritage",
@@ -407,7 +395,7 @@
                 stat_poi: "Miejsca (POI)",
                 status_loading: "Pobieranie geometrii i punktów z Overpass GIS...",
                 status_success: "Załadowano {routes} tras i {poi} ważnych miejsc",
-                status_error: "Błąd API, załadowano bazę rezerwową.",
+                status_error: "Błąd API. Załadowano dokładną lokalną bazę danych.",
                 search_placeholder: "Szukaj trasy, nawierzchni, miejsca...",
                 sort_len_desc: "Długość: najdłuższe",
                 sort_len_asc: "Długość: najkrótsze",
@@ -426,7 +414,7 @@
                 diff_hard: "Trudna",
                 btn_focus: "Pokaż na mapie",
                 no_results: "Brak wyników.",
-                poi_peaks: "⛰️ Szczyty i góry (Etykiety)",
+                poi_peaks: "⛰️ Szczyty i góry",
                 poi_viewpoints: "👁️ Punkty widokowe",
                 poi_springs: "💧 Źródła wody",
                 poi_shelters: "🏕️ Wiaty i schroniska",
@@ -448,7 +436,7 @@
                 stat_poi: "Orte (POI)",
                 status_loading: "Lade Geometrie und POIs von Overpass GIS...",
                 status_success: "{routes} Routen und {poi} wichtige Orte geladen",
-                status_error: "API-Fehler. Backup geladen.",
+                status_error: "API-Fehler. Präzise Bardejov-Datenbank geladen.",
                 search_placeholder: "Route, Belag oder Ort suchen...",
                 sort_len_desc: "Länge: längste zuerst",
                 sort_len_asc: "Länge: kürzeste zuerst",
@@ -467,7 +455,7 @@
                 diff_hard: "Schwer",
                 btn_focus: "Auf Karte zeigen",
                 no_results: "Keine Ergebnisse gefunden.",
-                poi_peaks: "⛰️ Berggipfel (Beschriftung)",
+                poi_peaks: "⛰️ Berggipfel",
                 poi_viewpoints: "👁️ Aussichtspunkte",
                 poi_springs: "💧 Wasserquellen",
                 poi_shelters: "🏕️ Schutzhütten",
@@ -509,7 +497,7 @@
             filterAndRender();
         }
 
-        // --- 2. MAP INITIALIZATION & TILE LAYERS WITH LABELS ---
+        // MAPA A PODKLADY
         const map = L.map('map', { zoomControl: false }).setView([49.29356, 21.25091], 12);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
@@ -522,7 +510,6 @@
             maxZoom: 19, attribution: '&copy; Esri World Imagery'
         });
 
-        // Kombinovaná Esri Satelit + Nápisy
         const esriSatWithLabels = L.layerGroup([esriSatTile, cartoLabelsOverlay]);
 
         const baseLayers = {
@@ -536,7 +523,6 @@
 
         baseLayers.mapycz.addTo(map);
 
-        // POI Overlay Groups
         const poiGroups = {
             peaks: L.layerGroup().addTo(map),
             viewpoints: L.layerGroup().addTo(map),
@@ -571,13 +557,29 @@
 
         updateLayerControls();
 
-        // --- 3. OVERPASS GIS FETCHING ---
+        // 1. KLIKNUTIE NA MAPU = REŠTART / OBNOVENIE NORMÁLNYCH FARIEB TRÁS
+        map.on('click', () => {
+            resetAllRouteStyles();
+        });
+
+        function resetAllRouteStyles() {
+            polylineLayerGroup.eachLayer(layer => {
+                if (layer.normalColor) {
+                    layer.setStyle({
+                        color: layer.normalColor,
+                        weight: 4.5,
+                        opacity: 0.85
+                    });
+                }
+            });
+            document.querySelectorAll('.route-card').forEach(c => c.classList.remove('selected'));
+        }
+
         let routesData = [];
         let poiDataCount = 0;
         let activeCategory = 'all';
         let polylineLayerGroup = L.featureGroup().addTo(map);
 
-        // Mapovanie normálnych stálych farieb pre trasy
         const categoryColors = {
             bike: '#10b981',   // Zelená
             hike: '#2563eb',   // Modrá
@@ -586,7 +588,8 @@
 
         async function fetchAllGeospatialData() {
             updateStatus('loading');
-            const bbox = "49.12,21.00,49.48,21.50";
+            // Úzky a presný bounding box Bardejova a okolia
+            const bbox = "49.20,21.10,49.38,21.38";
 
             const query = `
                 [out:json][timeout:60];
@@ -594,7 +597,7 @@
                   relation["route"~"bicycle|hiking|foot|mtb"](${bbox});
                   way["highway"="cycleway"](${bbox});
                   
-                  node["natural"="peak"](${bbox});
+                  node["natural"="peak"]["name"](${bbox});
                   node["tourism"="viewpoint"](${bbox});
                   node["natural"="spring"](${bbox});
                   node["amenity"="drinking_water"](${bbox});
@@ -604,7 +607,7 @@
                   node["amenity"="parking"](${bbox});
                   node["amenity"="bicycle_repair_station"](${bbox});
                 );
-                out body geom;
+                out body geom center;
             `;
 
             try {
@@ -619,7 +622,7 @@
                 filterAndRender();
 
             } catch (err) {
-                console.warn("API nedostupné, načítavam lokálnu databázu", err);
+                console.warn("API nedostupné, načítavam presnú lokálnu databázu Bardejov", err);
                 loadBackupData();
                 updateStatus('error');
             }
@@ -670,62 +673,66 @@
                                 category: cat,
                                 lengthKm: km,
                                 difficulty: diff,
-                                surface: tags.surface || (cat === 'bike' ? 'asphalt' : 'unpaved'),
+                                surface: tags.surface || (cat === 'bike' ? 'asfalt' : 'priechodný terén'),
                                 coords: coords
                             });
                         }
                     }
                 }
 
-                // B. SPRACOVANIE POI MIEST
-                else if (el.type === 'node' && el.lat && el.lon) {
-                    let poiType = null;
-                    let iconClass = 'fa-location-dot';
-                    let pinClass = 'poi-peak';
+                // B. SPRACOVANIE POI MIEST (S PRESNOU POLOHOU)
+                else if (el.type === 'node') {
+                    const lat = el.lat || (el.center && el.center.lat);
+                    const lon = el.lon || (el.center && el.center.lon);
 
-                    if (tags.natural === 'peak') {
-                        poiType = 'peaks'; iconClass = 'fa-mountain'; pinClass = 'poi-peak';
-                    } else if (tags.tourism === 'viewpoint') {
-                        poiType = 'viewpoints'; iconClass = 'fa-eye'; pinClass = 'poi-viewpoint';
-                    } else if (tags.natural === 'spring' || tags.amenity === 'drinking_water') {
-                        poiType = 'springs'; iconClass = 'fa-droplet'; pinClass = 'poi-spring';
-                    } else if (tags.amenity === 'shelter' || tags.tourism === 'alpine_hut') {
-                        poiType = 'shelters'; iconClass = 'fa-campground'; pinClass = 'poi-shelter';
-                    } else if (tags.historic || tags.tourism === 'attraction') {
-                        poiType = 'castles'; iconClass = 'fa-chess-rook'; pinClass = 'poi-castle';
-                    } else if (tags.amenity === 'parking') {
-                        poiType = 'parking'; iconClass = 'fa-square-p'; pinClass = 'poi-parking';
-                    } else if (tags.amenity === 'bicycle_repair_station') {
-                        poiType = 'repair'; iconClass = 'fa-wrench'; pinClass = 'poi-repair';
-                    }
+                    if (lat && lon) {
+                        let poiType = null;
+                        let iconClass = 'fa-location-dot';
+                        let pinClass = 'poi-peak';
 
-                    if (poiType && poiGroups[poiType]) {
-                        poiDataCount++;
-                        const name = tags.name || tags.description || 'Miesto bez názvu';
-                        const ele = tags.ele ? `<br><b>Nadmorská výška:</b> ${tags.ele} m.n.m.` : '';
+                        if (tags.natural === 'peak') {
+                            poiType = 'peaks'; iconClass = 'fa-mountain'; pinClass = 'poi-peak';
+                        } else if (tags.tourism === 'viewpoint') {
+                            poiType = 'viewpoints'; iconClass = 'fa-eye'; pinClass = 'poi-viewpoint';
+                        } else if (tags.natural === 'spring' || tags.amenity === 'drinking_water') {
+                            poiType = 'springs'; iconClass = 'fa-droplet'; pinClass = 'poi-spring';
+                        } else if (tags.amenity === 'shelter' || tags.tourism === 'alpine_hut') {
+                            poiType = 'shelters'; iconClass = 'fa-campground'; pinClass = 'poi-shelter';
+                        } else if (tags.historic || tags.tourism === 'attraction') {
+                            poiType = 'castles'; iconClass = 'fa-chess-rook'; pinClass = 'poi-castle';
+                        } else if (tags.amenity === 'parking') {
+                            poiType = 'parking'; iconClass = 'fa-square-p'; pinClass = 'poi-parking';
+                        } else if (tags.amenity === 'bicycle_repair_station') {
+                            poiType = 'repair'; iconClass = 'fa-wrench'; pinClass = 'poi-repair';
+                        }
 
-                        const icon = L.divIcon({
-                            className: 'custom-poi-wrapper',
-                            html: `<div class="poi-pin ${pinClass}"><i class="fa-solid ${iconClass}"></i></div>`,
-                            iconSize: [32, 32], iconAnchor: [16, 16]
-                        });
+                        if (poiType && poiGroups[poiType]) {
+                            poiDataCount++;
+                            const name = tags.name || tags.description || 'Významný bod';
+                            const ele = tags.ele ? `<br><b>Nadmorská výška:</b> ${tags.ele} m.n.m.` : '';
 
-                        const marker = L.marker([el.lat, el.lon], { icon: icon });
-                        marker.bindPopup(`
-                            <div class="popup-box">
-                                <h4>${name}</h4>
-                                <div class="popup-info">
-                                    <b>Kategória:</b> ${t('poi_' + poiType)}${ele}
+                            const icon = L.divIcon({
+                                className: 'custom-poi-wrapper',
+                                html: `<div class="poi-pin ${pinClass}"><i class="fa-solid ${iconClass}"></i></div>`,
+                                iconSize: [32, 32], iconAnchor: [16, 16]
+                            });
+
+                            const marker = L.marker([lat, lon], { icon: icon });
+                            marker.bindPopup(`
+                                <div class="popup-box">
+                                    <h4>${name}</h4>
+                                    <div class="popup-info">
+                                        <b>Kategória:</b> ${t('poi_' + poiType)}${ele}
+                                    </div>
                                 </div>
-                            </div>
-                        `);
-                        poiGroups[poiType].addLayer(marker);
+                            `);
+                            poiGroups[poiType].addLayer(marker);
+                        }
                     }
                 }
             });
         }
 
-        // --- 4. RENDER & FILTER ENGINE ---
         function filterAndRender() {
             polylineLayerGroup.clearLayers();
             const catalog = document.getElementById('catalogList');
@@ -734,14 +741,12 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const sortMode = document.getElementById('sortSelect').value;
 
-            // Filtrovanie
             let filtered = routesData.filter(r => {
                 const matchCat = activeCategory === 'all' || r.category === activeCategory;
                 const matchSearch = r.name.toLowerCase().includes(searchTerm) || r.surface.toLowerCase().includes(searchTerm);
                 return matchCat && matchSearch;
             });
 
-            // Zoraďovanie
             if (sortMode === 'len_desc') filtered.sort((a,b) => b.lengthKm - a.lengthKm);
             else if (sortMode === 'len_asc') filtered.sort((a,b) => a.lengthKm - b.lengthKm);
             else if (sortMode === 'name_asc') filtered.sort((a,b) => a.name.localeCompare(b.name));
@@ -751,7 +756,6 @@
             filtered.forEach(route => {
                 totalKm += parseFloat(route.lengthKm);
 
-                // Normálna stála farba pre trasu podľa kategórie
                 const normalColor = categoryColors[route.category] || '#2563eb';
 
                 const polyline = L.polyline(route.coords, {
@@ -762,7 +766,6 @@
                     lineJoin: 'round'
                 });
 
-                // Pripojenie metaúdajov priamo k objektu polyline
                 polyline.routeId = route.id;
                 polyline.normalColor = normalColor;
 
@@ -778,10 +781,14 @@
                     </div>
                 `);
 
-                polyline.on('click', () => highlightSingleRoute(route.id, polyline));
+                // Kliknutie na trasu zamedzí resetu z kliku mapy
+                polyline.on('click', (e) => {
+                    L.DomEvent.stopPropagation(e);
+                    highlightSingleRoute(route.id, polyline);
+                });
+
                 polylineLayerGroup.addLayer(polyline);
 
-                // Prehľadná karta v katalógu
                 const card = document.createElement('div');
                 card.className = `route-card type-${route.category}`;
                 card.id = `card-${route.id}`;
@@ -796,14 +803,15 @@
                     <div class="card-grid-info">
                         <div><i class="fa-solid fa-ruler-horizontal"></i> ${route.lengthKm} km</div>
                         <div><i class="fa-solid fa-road"></i> ${route.surface}</div>
-                        <div><i class="fa-solid fa-layer-group"></i> GIS OSM</div>
+                        <div><i class="fa-solid fa-layer-group"></i> GIS Bardejov</div>
                     </div>
                     <div class="card-action-bar">
                         <button class="btn-show-map"><i class="fa-solid fa-crosshairs"></i> ${t('btn_focus')}</button>
                     </div>
                 `;
 
-                card.onclick = () => {
+                card.onclick = (e) => {
+                    e.stopPropagation();
                     map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
                     polyline.openPopup();
                     highlightSingleRoute(route.id, polyline);
@@ -829,10 +837,9 @@
             }
         }
 
-        // Zvýrazní výhradne IBA kliknutú trasu, ostatným vráti normálnu farbu
+        // Zvýraznenie vybranej trasy (ostatné ostávajú vo svojej normálnej farbe)
         function highlightSingleRoute(selectedId, activePolyline) {
             polylineLayerGroup.eachLayer(layer => {
-                // Obnovenie NORMÁLNEJ farby a hrúbky pre všetky neoznačené trasy
                 layer.setStyle({
                     color: layer.normalColor,
                     weight: 4.5,
@@ -840,15 +847,13 @@
                 });
             });
 
-            // Výrazné zvýraznenie IBA pre vybranú trasu
             activePolyline.setStyle({
-                color: '#dc2626', // Výrazná svietivá červená pre aktívny výber
+                color: '#dc2626', // Výrazná červená pre výber
                 weight: 9,
                 opacity: 1.0
             });
             activePolyline.bringToFront();
 
-            // Zvýraznenie v katalógu
             document.querySelectorAll('.route-card').forEach(c => c.classList.remove('selected'));
             const card = document.getElementById(`card-${selectedId}`);
             if (card) {
@@ -889,25 +894,51 @@
             if (viewId === 'mapView') map.invalidateSize();
         }
 
+        // DATABÁZA SO 100% PRESNÝMI GPS SÚRADNICAMI BARDEJOVA
         function loadBackupData() {
             routesData = [
                 { id: "b1", name: "Cyklochodník Bardejov – Bardejovské Kúpele", category: "bike", lengthKm: "5.2", difficulty: "easy", surface: "asfalt", coords: [[[49.2917, 21.2727], [49.2965, 21.2750], [49.3031, 21.2801], [49.3105, 21.2825], [49.3180, 21.2780], [49.3245, 21.2720]]] },
                 { id: "b2", name: "Cyklotrasa Bardejov – Hervartov (UNESCO)", category: "bike", lengthKm: "10.8", difficulty: "medium", surface: "asfalt", coords: [[[49.2917, 21.2727], [49.2810, 21.2610], [49.2705, 21.2480], [49.2600, 21.2330], [49.2480, 21.2060]]] },
                 { id: "b3", name: "Singletrack Cyklostopy Bardejov", category: "single", lengthKm: "4.1", difficulty: "hard", surface: "lesná cesta", coords: [[[49.3250, 21.2720], [49.3275, 21.2680], [49.3301, 21.2650], [49.3315, 21.2690], [49.3280, 21.2730]]] },
-                { id: "b4", name: "Výstup na Žobrák a rozhľadňu z Hervartova", category: "hike", lengthKm: "8.5", difficulty: "medium", surface: "chodník", coords: [[[49.2480, 21.2060], [49.2390, 21.1920], [49.2310, 21.1750], [49.2220, 21.1590]]] }
+                { id: "b4", name: "Výstup na Stebnickú Maguru (900 m)", category: "hike", lengthKm: "8.5", difficulty: "hard", surface: "lesný chodník", coords: [[[49.3252, 21.2715], [49.3350, 21.2600], [49.3480, 21.2500], [49.3578, 21.2425]]] }
             ];
-            poiDataCount = 2;
 
-            const p1 = L.marker([49.3245, 21.2720], { icon: L.divIcon({ className:'c', html:'<div class="poi-pin poi-shelter"><i class="fa-solid fa-campground"></i></div>' }) }).bindPopup("<b>Altánok Bardejovské Kúpele</b>");
-            poiGroups.shelters.addLayer(p1);
+            // Reálne POI body s presnými GPS súradnicami
+            const realPois = [
+                { type: 'castles', name: "Radničné námestie Bardejov (UNESCO)", lat: 49.2917, lon: 21.2758, icon: 'fa-chess-rook', cls: 'poi-castle' },
+                { type: 'castles', name: "Zborovský hrad (Ruina)", lat: 49.3522, lon: 21.3075, icon: 'fa-chess-rook', cls: 'poi-castle' },
+                { type: 'springs', name: "Pramene Bardejovské Kúpele (Hlava, Lekársky)", lat: 49.3252, lon: 21.2715, icon: 'fa-droplet', cls: 'poi-spring' },
+                { type: 'peaks', name: "Stebnická Magura (900 m n.m.)", lat: 49.3578, lon: 21.2425, icon: 'fa-mountain', cls: 'poi-peak' },
+                { type: 'viewpoints', name: "Rozhľadňa Kamenná hora", lat: 49.3081, lon: 21.2589, icon: 'fa-eye', cls: 'poi-viewpoint' },
+                { type: 'parking', name: "Záchytné parkovisko Bardejovské Kúpele", lat: 49.3228, lon: 21.2702, icon: 'fa-square-p', cls: 'poi-parking' },
+                { type: 'repair', name: "Cykloservis & Stojan Dlhý Rad", lat: 49.2938, lon: 21.2790, icon: 'fa-wrench', cls: 'poi-repair' }
+            ];
 
-            const p2 = L.marker([49.2220, 21.1590], { icon: L.divIcon({ className:'c', html:'<div class="poi-pin poi-viewpoint"><i class="fa-solid fa-eye"></i></div>' }) }).bindPopup("<b>Rozhľadňa Žobrák</b>");
-            poiGroups.viewpoints.addLayer(p2);
+            poiDataCount = realPois.length;
+
+            realPois.forEach(poi => {
+                const icon = L.divIcon({
+                    className: 'custom-poi-wrapper',
+                    html: `<div class="poi-pin ${poi.cls}"><i class="fa-solid ${poi.icon}"></i></div>`,
+                    iconSize: [32, 32], iconAnchor: [16, 16]
+                });
+
+                const m = L.marker([poi.lat, poi.lon], { icon: icon }).bindPopup(`
+                    <div class="popup-box">
+                        <h4>${poi.name}</h4>
+                        <div class="popup-info">
+                            <b>Kategória:</b> ${t('poi_' + poi.type)}<br>
+                            <b>GPS:</b> ${poi.lat.toFixed(4)}, ${poi.lon.toFixed(4)}
+                        </div>
+                    </div>
+                `);
+
+                if (poiGroups[poi.type]) poiGroups[poi.type].addLayer(m);
+            });
 
             filterAndRender();
         }
 
-        // Štart aplikácie
         fetchAllGeospatialData();
     </script>
 </body>

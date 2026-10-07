@@ -87,6 +87,7 @@
         .status-badge.success { background: #dcfce7; color: #15803d; }
         .status-badge.warning { background: #fef3c7; color: #b45309; }
         .status-badge.error { background: #fee2e2; color: #b91c1c; }
+        .status-detail { flex-basis: 100%; font-size: 0.68rem; font-weight: 500; opacity: 0.9; word-break: break-word; }
         .status-badge button {
             margin-left: auto; border: 1px solid currentColor; background: transparent; color: inherit;
             padding: 0.2rem 0.55rem; border-radius: 6px; font-size: 0.72rem; font-weight: 700; cursor: pointer;
@@ -158,7 +159,16 @@
         .card-grid-info div { display: flex; align-items: center; gap: 0.35rem; }
         .card-grid-info i { color: var(--primary); font-size: 0.85rem; }
 
-        .card-action-bar { display: flex; justify-content: flex-end; }
+        .card-action-bar { display: flex; justify-content: flex-end; gap: 0.4rem; }
+        .btn-sat {
+            background: #e0f2fe; border: 1px solid #bae6fd; padding: 0.3rem 0.65rem; border-radius: 6px;
+            font-size: 0.72rem; font-weight: 700; color: #0369a1; cursor: pointer;
+            display: flex; align-items: center; gap: 0.3rem;
+        }
+        .btn-sat:hover { background: #0369a1; color: white; }
+        .btn-sat:disabled { opacity: 0.6; cursor: progress; }
+        .surf-src { font-size: 0.6rem; font-weight: 800; background: #e0f2fe; color: #0369a1; padding: 1px 4px; border-radius: 4px; white-space: nowrap; }
+        .surf-src.osm { background: #dcfce7; color: #15803d; }
         .btn-show-map {
             background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.65rem;
             border-radius: 6px; font-size: 0.72rem; font-weight: 700; color: var(--text-muted);
@@ -255,6 +265,7 @@
                         <option value="name_asc" data-i18n="sort_name_asc">Názov: A – Z</option>
                     </select>
                     <button class="btn-export" onclick="exportDataset()" id="btnExport" title="bardejov-data.json"><i class="fa-solid fa-download"></i></button>
+                    <button class="btn-export" onclick="satAll()" id="btnSatAll"><i class="fa-solid fa-satellite"></i></button>
                 </div>
 
                 <div class="filter-pills">
@@ -311,6 +322,29 @@
             popup_length: "Dĺžka", popup_diff: "Náročnosť", popup_surface: "Povrch", popup_type: "Typ",
             popup_category: "Kategória", popup_elevation: "Nadmorská výška", poi_default: "Bod záujmu",
             surface_mixed: "nezistený",
+            surf_asphalt: "asfalt",
+            surf_concrete: "betón",
+            surf_paving: "dlažba",
+            surf_cobble: "dlažobné kocky",
+            surf_paved: "spevnený povrch",
+            surf_compacted: "udusený štrk",
+            surf_gravel: "štrk",
+            surf_unpaved: "nespevnený povrch",
+            surf_dirt: "zemina",
+            surf_grass: "tráva",
+            surf_sand: "piesok",
+            surf_wood: "drevo",
+            surf_mixed: "zmiešaný",
+            surf_covered: "zakryté (les / tráva)",
+            surf_unknown: "nezistený",
+            surf_src_sat: "satelit",
+            surf_est: "odhad",
+            surf_conf_low: "nízka istota",
+            surf_conf_mid: "stredná istota",
+            btn_sat: "Povrch zo satelitu",
+            btn_sat_all: "Analyzovať povrch všetkých trás zo satelitu",
+            sat_failed: "Satelitné snímky sa nepodarilo načítať",
+            sat_confirm: "Analýza stiahne veľa satelitných dlaždíc (desiatky MB). Pokračovať?",
             poi_peaks: "⛰️ Vrcholy & Kopce", poi_viewpoints: "👁️ Vyhliadky & Rozhľadne",
             poi_springs: "💧 Pramene & Pitná voda", poi_shelters: "🏕️ Altánky & Chaty",
             poi_castles: "🏰 Hrady & Pamiatky", poi_parking: "🅿️ Parkoviská", poi_repair: "🔧 Cykloservis",
@@ -342,6 +376,29 @@
             popup_length: "Length", popup_diff: "Difficulty", popup_surface: "Surface", popup_type: "Type",
             popup_category: "Category", popup_elevation: "Elevation", poi_default: "Point of interest",
             surface_mixed: "unknown",
+            surf_asphalt: "asphalt",
+            surf_concrete: "concrete",
+            surf_paving: "paving stones",
+            surf_cobble: "cobblestones",
+            surf_paved: "paved",
+            surf_compacted: "compacted gravel",
+            surf_gravel: "gravel",
+            surf_unpaved: "unpaved",
+            surf_dirt: "dirt",
+            surf_grass: "grass",
+            surf_sand: "sand",
+            surf_wood: "wood",
+            surf_mixed: "mixed",
+            surf_covered: "hidden (forest / grass)",
+            surf_unknown: "unknown",
+            surf_src_sat: "satellite",
+            surf_est: "estimate",
+            surf_conf_low: "low confidence",
+            surf_conf_mid: "medium confidence",
+            btn_sat: "Surface from satellite",
+            btn_sat_all: "Analyse surface of all routes from satellite",
+            sat_failed: "Satellite imagery could not be loaded",
+            sat_confirm: "The analysis downloads many satellite tiles (tens of MB). Continue?",
             poi_peaks: "⛰️ Mountain Peaks", poi_viewpoints: "👁️ Viewpoints & Towers",
             poi_springs: "💧 Water Springs", poi_shelters: "🏕️ Shelters & Huts",
             poi_castles: "🏰 Castles & Heritage", poi_parking: "🅿️ Parking Lots", poi_repair: "🔧 Bike Repair",
@@ -373,6 +430,29 @@
             popup_length: "Długość", popup_diff: "Trudność", popup_surface: "Nawierzchnia", popup_type: "Typ",
             popup_category: "Kategoria", popup_elevation: "Wysokość", poi_default: "Punkt zainteresowania",
             surface_mixed: "nieznana",
+            surf_asphalt: "asfalt",
+            surf_concrete: "beton",
+            surf_paving: "kostka brukowa",
+            surf_cobble: "bruk",
+            surf_paved: "nawierzchnia utwardzona",
+            surf_compacted: "ubity żwir",
+            surf_gravel: "żwir",
+            surf_unpaved: "nawierzchnia gruntowa",
+            surf_dirt: "ziemia",
+            surf_grass: "trawa",
+            surf_sand: "piasek",
+            surf_wood: "drewno",
+            surf_mixed: "mieszana",
+            surf_covered: "zakryte (las / trawa)",
+            surf_unknown: "nieznana",
+            surf_src_sat: "satelita",
+            surf_est: "szacunek",
+            surf_conf_low: "niska pewność",
+            surf_conf_mid: "średnia pewność",
+            btn_sat: "Nawierzchnia z satelity",
+            btn_sat_all: "Analizuj nawierzchnię wszystkich tras z satelity",
+            sat_failed: "Nie udało się załadować zdjęć satelitarnych",
+            sat_confirm: "Analiza pobierze wiele kafelków satelitarnych (dziesiątki MB). Kontynuować?",
             poi_peaks: "⛰️ Szczyty i góry", poi_viewpoints: "👁️ Punkty widokowe",
             poi_springs: "💧 Źródła wody", poi_shelters: "🏕️ Wiaty i schroniska",
             poi_castles: "🏰 Zamki i zabytki", poi_parking: "🅿️ Parkingi", poi_repair: "🔧 Serwis rowerowy",
@@ -404,6 +484,29 @@
             popup_length: "Länge", popup_diff: "Schwierigkeit", popup_surface: "Belag", popup_type: "Typ",
             popup_category: "Kategorie", popup_elevation: "Höhe", poi_default: "Sehenswürdigkeit",
             surface_mixed: "unbekannt",
+            surf_asphalt: "Asphalt",
+            surf_concrete: "Beton",
+            surf_paving: "Pflastersteine",
+            surf_cobble: "Kopfsteinpflaster",
+            surf_paved: "befestigt",
+            surf_compacted: "verdichteter Kies",
+            surf_gravel: "Schotter",
+            surf_unpaved: "unbefestigt",
+            surf_dirt: "Erde",
+            surf_grass: "Gras",
+            surf_sand: "Sand",
+            surf_wood: "Holz",
+            surf_mixed: "gemischt",
+            surf_covered: "verdeckt (Wald / Gras)",
+            surf_unknown: "unbekannt",
+            surf_src_sat: "Satellit",
+            surf_est: "Schätzung",
+            surf_conf_low: "geringe Sicherheit",
+            surf_conf_mid: "mittlere Sicherheit",
+            btn_sat: "Belag per Satellit",
+            btn_sat_all: "Belag aller Routen per Satellit analysieren",
+            sat_failed: "Satellitenbilder konnten nicht geladen werden",
+            sat_confirm: "Die Analyse lädt viele Satellitenkacheln (mehrere zehn MB). Fortfahren?",
             poi_peaks: "⛰️ Berggipfel", poi_viewpoints: "👁️ Aussichtspunkte",
             poi_springs: "💧 Wasserquellen", poi_shelters: "🏕️ Schutzhütten",
             poi_castles: "🏰 Burgen & Denkmäler", poi_parking: "🅿️ Parkplätze", poi_repair: "🔧 Fahrrad-Service",
@@ -582,6 +685,8 @@
        Slovensko sa nesťahujú celé. */
     const OVERPASS_ENDPOINTS = [
         "https://overpass-api.de/api/interpreter",
+        "https://lz4.overpass-api.de/api/interpreter",
+        "https://z.overpass-api.de/api/interpreter",
         "https://overpass.private.coffee/api/interpreter",
         "https://maps.mail.ru/osm/tools/overpass/api/interpreter"
     ];
@@ -589,27 +694,37 @@
     const HEDGE_MS = 8000;
     const REQUEST_TIMEOUT_MS = 60000;
 
-    const ROUTES_QUERY = `[out:json][timeout:55];
+    const routesQueryFor = bb => `[out:json][timeout:55];
 (
-  relation["route"~"^(bicycle|hiking|mtb)$"](${BBOX});
-  way["highway"="cycleway"](${BBOX});
+  relation["route"~"^(bicycle|hiking|mtb)$"](${bb});
+  way["highway"="cycleway"](${bb});
 );
-out geom(${BBOX});`;
+out geom(${bb});`;
 
-    const POI_QUERY = `[out:json][timeout:55];
+    const poiQueryFor = bb => `[out:json][timeout:55];
 (
-  nwr["natural"="peak"]["name"](${BBOX});
-  nwr["tourism"="viewpoint"](${BBOX});
-  nwr["man_made"="tower"]["tower:type"="observation"](${BBOX});
-  nwr["natural"="spring"](${BBOX});
-  nwr["amenity"="drinking_water"](${BBOX});
-  nwr["amenity"="shelter"](${BBOX});
-  nwr["historic"~"^(castle|ruins|fort)$"](${BBOX});
-  nwr["amenity"="parking"]["name"](${BBOX});
-  nwr["amenity"="bicycle_repair_station"](${BBOX});
-  nwr["shop"="bicycle"](${BBOX});
+  nwr["natural"="peak"]["name"](${bb});
+  nwr["tourism"="viewpoint"](${bb});
+  nwr["man_made"="tower"]["tower:type"="observation"](${bb});
+  nwr["natural"="spring"](${bb});
+  nwr["amenity"="drinking_water"](${bb});
+  nwr["amenity"="shelter"](${bb});
+  nwr["historic"~"^(castle|ruins|fort)$"](${bb});
+  nwr["amenity"="parking"]["name"](${bb});
+  nwr["amenity"="bicycle_repair_station"](${bb});
+  nwr["shop"="bicycle"](${bb});
 );
 out center tags;`;
+
+    // oblasť rozdelená na n×n dlaždíc – menšie dotazy prejdú aj cez preťažený server
+    function tileBoxes(n) {
+        const [s, w, nn, e] = BBOX.split(',').map(Number);
+        const dLat = (nn - s) / n, dLon = (e - w) / n, out = [];
+        for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+            out.push([s + i * dLat, w + j * dLon, s + (i + 1) * dLat, w + (j + 1) * dLon].map(v => v.toFixed(4)).join(','));
+        }
+        return out;
+    }
 
     async function fetchOne(endpoint, query, signal) {
         const ctl = new AbortController();
@@ -698,48 +813,45 @@ out center tags;`;
     function difficultyFor(km) { return km > 12 ? 'hard' : km > 6 ? 'medium' : 'easy'; }
 
     function parseRoutes(elements) {
-        const out = [];
-        const seenId = new Set(), seenKey = new Set();
+        // 1. fáza: zlúčiť úseky toho istého prvku (môže prísť z viacerých dlaždíc)
+        const acc = new Map();
         for (const el of elements) {
             const tags = el.tags || {};
+            let cat, coords, id;
             if (el.type === 'relation' && tags.route && Array.isArray(el.members)) {
-                const cat = tags.route === 'bicycle' ? 'bike' : tags.route === 'mtb' ? 'single' : 'hike';
-                const coords = [];
+                cat = tags.route === 'bicycle' ? 'bike' : tags.route === 'mtb' ? 'single' : 'hike';
+                coords = [];
                 for (const m of el.members) {
                     if (m.type === 'way' && Array.isArray(m.geometry)) coords.push(...geomSegments(m.geometry));
                 }
-                if (!coords.length) continue;
-                const km = coords.reduce((s, c) => s + segLengthM(c), 0) / 1000;
+                id = `rel-${el.id}`;
+            } else if (el.type === 'way' && tags.highway === 'cycleway' && Array.isArray(el.geometry)) {
+                cat = 'bike'; coords = geomSegments(el.geometry); id = `way-${el.id}`;
+            } else continue;
+            if (!coords.length) continue;
+            const ex = acc.get(id);
+            if (ex) ex.coords.push(...coords); else acc.set(id, { id, cat, tags, coords });
+        }
+        // 2. fáza: dĺžky, filtre, duplicity
+        const out = [], seenKey = new Set();
+        for (const r of acc.values()) {
+            const tags = r.tags;
+            const km = r.coords.reduce((sum, c) => sum + segLengthM(c), 0) / 1000;
+            const name = tags.name || '', ref = tags.ref || '';
+            const ft = tags.from && tags.to ? `${tags.from} – ${tags.to}` : '';
+            if (r.id.startsWith('rel-')) {
                 if (km < 0.5) continue;
-                const id = `rel-${el.id}`;
-                if (seenId.has(id)) continue; seenId.add(id);
-                const name = tags.name || '';
-                const ref = tags.ref || '';
-                const ft = tags.from && tags.to ? `${tags.from} – ${tags.to}` : '';
-                // smerové duplicity (tam/späť) sa nezobrazujú dvakrát
                 const label = name || ref || ft;
                 if (label) {
-                    const key = `${cat}|${label}|${km.toFixed(1)}`;
+                    const key = `${r.cat}|${label}|${km.toFixed(1)}`;
                     if (seenKey.has(key)) continue; seenKey.add(key);
                 }
-                out.push({
-                    id, category: cat, lengthKm: km.toFixed(1), difficulty: difficultyFor(km),
-                    name, ref, ft, surface: tags.surface || '', coords
-                });
-            } else if (el.type === 'way' && tags.highway === 'cycleway' && Array.isArray(el.geometry)) {
-                const coords = geomSegments(el.geometry);
-                if (!coords.length) continue;
-                const km = coords.reduce((s, c) => s + segLengthM(c), 0) / 1000;
-                // nepomenované kúsky cyklochodníkov zahltia katalóg, berieme len dlhšie
-                if (km < (tags.name ? 0.3 : 0.8)) continue;
-                const id = `way-${el.id}`;
-                if (seenId.has(id)) continue; seenId.add(id);
-                out.push({
-                    id, category: 'bike', lengthKm: km.toFixed(1), difficulty: 'easy',
-                    name: tags.name || '', ref: tags.ref || '', ft: '',
-                    surface: tags.surface || '', coords
-                });
-            }
+            } else if (km < (name ? 0.3 : 0.8)) continue;
+            out.push({
+                id: r.id, category: r.cat, lengthKm: km.toFixed(1),
+                difficulty: r.cat === 'bike' && r.id.startsWith('way-') ? 'easy' : difficultyFor(km),
+                name, ref, ft, surface: tags.surface || '', coords: r.coords
+            });
         }
         return out;
     }
@@ -772,15 +884,25 @@ out center tags;`;
         return out;
     }
 
-    async function fetchRoutes() {
-        const routes = parseRoutes(await overpass(ROUTES_QUERY));
-        if (!routes.length) throw new Error('server vrátil 0 trás');
-        return routes;
-    }
-    async function fetchPois() {
-        const pois = parsePois(await overpass(POI_QUERY));
-        if (!pois.length) throw new Error('server vrátil 0 miest');
-        return pois;
+    // Celá oblasť naraz; ak zlyhá, 4 menšie dlaždice. complete=false => niečo chýba, skúsi sa znova.
+    async function fetchTiled(queryFor, parse, label) {
+        let els, complete = true;
+        try {
+            els = await overpass(queryFor(BBOX), 1);
+        } catch (e) {
+            lastError = e.message;
+            els = []; let ok = 0;
+            const boxes = tileBoxes(2);
+            for (const bb of boxes) {
+                try { els = els.concat(await overpass(queryFor(bb), 1)); ok++; }
+                catch (err) { lastError = err.message; }
+            }
+            if (!ok) throw new Error(lastError || `${label}: všetky dlaždice zlyhali`);
+            complete = ok === boxes.length;
+        }
+        const items = parse(els);
+        if (!items.length) throw new Error(`${label}: server vrátil 0 položiek`);
+        return { items, complete };
     }
 
     /* ---------- Núdzový režim: len pomenované miesta cez Nominatim ----------
@@ -843,6 +965,45 @@ out center tags;`;
         document.getElementById('statPoi').innerText = dataset.pois.length;
     }
 
+    /* =====================================================================
+       POVRCH CIEST
+       1) údaj z OSM (tag surface), ak existuje a je rozpoznaný
+       2) inak odhad zo satelitnej snímky (Esri World Imagery) – hrubá heuristika
+    ===================================================================== */
+    const OSM_SURFACE = {
+        asphalt: 'asphalt', concrete: 'concrete', 'concrete:plates': 'concrete', 'concrete:lanes': 'concrete',
+        paving_stones: 'paving', sett: 'cobble', cobblestone: 'cobble', unhewn_cobblestone: 'cobble',
+        paved: 'paved', compacted: 'compacted', fine_gravel: 'compacted', gravel: 'gravel', pebblestone: 'gravel',
+        unpaved: 'unpaved', dirt: 'dirt', earth: 'dirt', ground: 'dirt', mud: 'dirt',
+        grass: 'grass', sand: 'sand', wood: 'wood', woodchips: 'wood'
+    };
+    function osmSurfaceClass(raw) {
+        if (!raw) return null;
+        const v = String(raw).split(';')[0].trim().toLowerCase();
+        return OSM_SURFACE[v] || null;
+    }
+
+    let satResults = {};              // id trasy -> { cls, conf, share, coverage, n }
+    const satBusy = new Set();
+    const polyById = new Map();
+
+    function surfaceInfo(route) {
+        const osm = osmSurfaceClass(route.surface);
+        if (osm) return { cls: osm, src: 'osm', text: t('surf_' + osm) };
+        const s = satResults[route.id];
+        if (s) {
+            const exact = ['asphalt', 'gravel', 'dirt'].includes(s.cls);
+            return { cls: s.cls, src: 'sat', conf: s.conf, text: (exact ? '≈ ' : '') + t('surf_' + s.cls) };
+        }
+        return { cls: null, src: null, text: t('surf_unknown') };
+    }
+    function surfaceCellHtml(info) {
+        let badge = '';
+        if (info.src === 'sat') badge = ` <small class="surf-src" title="${esc(t(info.conf === 'mid' ? 'surf_conf_mid' : 'surf_conf_low'))}">🛰️ ${t('surf_est')}</small>`;
+        else if (info.src === 'osm') badge = ' <small class="surf-src osm">OSM</small>';
+        return `<i class="fa-solid fa-road"></i> ${esc(info.text)}${badge}`;
+    }
+
     function displayName(r) {
         if (r.name) return r.name;
         if (r.ref) return `${t('type_' + r.category)} ${r.ref}`;
@@ -850,8 +1011,25 @@ out center tags;`;
         return `${t('type_' + r.category)} #${String(r.id).replace(/\D/g, '')}`;
     }
 
+    function popupHtml(route) {
+        const info = surfaceInfo(route);
+        const src = info.src === 'sat' ? ` (${t('surf_src_sat')}, ${t('surf_est')} – ${t(info.conf === 'mid' ? 'surf_conf_mid' : 'surf_conf_low')})`
+                  : info.src === 'osm' ? ' (OSM)' : '';
+        return `
+            <div class="popup-box">
+                <h4>${esc(displayName(route))}</h4>
+                <div class="popup-info">
+                    <b>${t('popup_length')}:</b> ${route.lengthKm} km<br>
+                    <b>${t('popup_diff')}:</b> ${t('diff_' + route.difficulty)}<br>
+                    <b>${t('popup_surface')}:</b> ${esc(info.text)}${esc(src)}<br>
+                    <b>${t('popup_type')}:</b> ${t('type_' + route.category)}
+                </div>
+            </div>`;
+    }
+
     function filterAndRender(fit = false) {
         polylineLayerGroup.clearLayers();
+        polyById.clear();
         const catalog = document.getElementById('catalogList');
         catalog.innerHTML = '';
 
@@ -860,7 +1038,7 @@ out center tags;`;
 
         const filtered = dataset.routes.filter(r => {
             const matchCat = activeCategory === 'all' || r.category === activeCategory;
-            const matchSearch = displayName(r).toLowerCase().includes(searchTerm) || (r.surface || '').toLowerCase().includes(searchTerm);
+            const matchSearch = displayName(r).toLowerCase().includes(searchTerm) || surfaceInfo(r).text.toLowerCase().includes(searchTerm);
             return matchCat && matchSearch;
         });
 
@@ -874,22 +1052,14 @@ out center tags;`;
         filtered.forEach(route => {
             totalKm += parseFloat(route.lengthKm);
             const normalColor = categoryColors[route.category] || '#2563eb';
-            const surface = route.surface || t('surface_mixed');
+            const info = surfaceInfo(route);
 
             const polyline = L.polyline(route.coords, { color: normalColor, weight: 4.5, opacity: 0.85, lineCap: 'round', lineJoin: 'round' });
             polyline.normalColor = normalColor;
-            polyline.bindPopup(`
-                <div class="popup-box">
-                    <h4>${esc(displayName(route))}</h4>
-                    <div class="popup-info">
-                        <b>${t('popup_length')}:</b> ${route.lengthKm} km<br>
-                        <b>${t('popup_diff')}:</b> ${t('diff_' + route.difficulty)}<br>
-                        <b>${t('popup_surface')}:</b> ${esc(surface)}<br>
-                        <b>${t('popup_type')}:</b> ${t('type_' + route.category)}
-                    </div>
-                </div>`);
+            polyline.bindPopup(popupHtml(route));
             polyline.on('click', e => { L.DomEvent.stopPropagation(e); highlightSingleRoute(route.id, polyline); });
             polylineLayerGroup.addLayer(polyline);
+            polyById.set(route.id, polyline);
 
             const card = document.createElement('div');
             card.className = `route-card type-${route.category}`;
@@ -904,10 +1074,10 @@ out center tags;`;
                 </div>
                 <div class="card-grid-info">
                     <div><i class="fa-solid fa-ruler-horizontal"></i> ${route.lengthKm} km</div>
-                    <div><i class="fa-solid fa-road"></i> ${esc(surface)}</div>
-                    <div><i class="fa-solid fa-layer-group"></i> OSM</div>
+                    <div class="surf-cell" style="grid-column: span 2;">${surfaceCellHtml(info)}</div>
                 </div>
                 <div class="card-action-bar">
+                    ${info.src ? '' : `<button class="btn-sat" onclick="event.stopPropagation(); satOne('${route.id}')"><i class="fa-solid fa-satellite"></i> ${t('btn_sat')}</button>`}
                     <button class="btn-show-map"><i class="fa-solid fa-crosshairs"></i> ${t('btn_focus')}</button>
                 </div>`;
             card.onclick = e => {
@@ -923,6 +1093,7 @@ out center tags;`;
         catalog.appendChild(frag);
         document.getElementById('statCount').innerText = filtered.length;
         document.getElementById('statKm').innerText = `${totalKm.toFixed(0)} km`;
+        document.getElementById('btnSatAll').title = t('btn_sat_all');
 
         if (filtered.length === 0) {
             catalog.innerHTML = `<p style="padding:1.5rem; color:var(--text-muted); font-size:0.85rem; text-align:center;">${t('no_results')}</p>`;
@@ -932,7 +1103,237 @@ out center tags;`;
         }
     }
 
+    /* ---------- Satelitná analýza ---------- */
+    const SAT_TILE = (z, x, y) => `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`;
+    const SAT_KEY = 'sat-v1';
+    const tileCache = new Map();
+    let tileInflight = 0;
+    const tileWaiters = [];
+    const TILE_CONCURRENCY = 6;
+    let satFailStreak = 0;
+
+    function acquireSlot() {
+        return new Promise(res => { if (tileInflight < TILE_CONCURRENCY) { tileInflight++; res(); } else tileWaiters.push(res); });
+    }
+    function releaseSlot() {
+        const w = tileWaiters.shift();
+        if (w) w(); else tileInflight--;
+    }
+
+    // vráti RGBA pixely dlaždice 256×256 alebo null (chyba / CORS / "map data not available")
+    function loadTile(z, x, y) {
+        const key = `${z}/${x}/${y}`;
+        if (tileCache.has(key)) return tileCache.get(key);
+        const p = (async () => {
+            await acquireSlot();
+            try {
+                const img = await new Promise((res, rej) => {
+                    const im = new Image();
+                    im.crossOrigin = 'anonymous';
+                    im.onload = () => res(im);
+                    im.onerror = () => rej(new Error('tile load'));
+                    im.src = SAT_TILE(z, x, y);
+                });
+                const c = document.createElement('canvas');
+                c.width = c.height = 256;
+                const ctx = c.getContext('2d', { willReadFrequently: true });
+                ctx.drawImage(img, 0, 0);
+                const data = ctx.getImageData(0, 0, 256, 256).data; // vyhodí chybu, ak je canvas "tainted"
+                // placeholder "Map data not yet available" je takmer jednofarebný
+                let sum = 0, sum2 = 0, cnt = 0;
+                for (let i = 0; i < data.length; i += 4 * 97) { const l = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114; sum += l; sum2 += l * l; cnt++; }
+                const sd = Math.sqrt(Math.max(0, sum2 / cnt - (sum / cnt) ** 2));
+                return sd < 6 ? null : data;
+            } catch (e) { return null; }
+            finally { releaseSlot(); }
+        })();
+        tileCache.set(key, p);
+        p.then(v => { if (!v) tileCache.delete(key); });
+        if (tileCache.size > 220) tileCache.delete(tileCache.keys().next().value);
+        return p;
+    }
+    let tileLoader = loadTile;
+
+    function latLonToPx(lat, lon, z) {
+        const n = 256 * Math.pow(2, z);
+        const sn = Math.sin(lat * Math.PI / 180);
+        return [(lon + 180) / 360 * n, (0.5 - Math.log((1 + sn) / (1 - sn)) / (4 * Math.PI)) * n];
+    }
+
+    // body rovnomerne rozložené pozdĺž trasy
+    function samplePoints(route, maxSamples) {
+        const total = route.coords.reduce((s, c) => s + segLengthM(c), 0);
+        const step = Math.max(60, total / maxSamples);
+        const pts = [];
+        let nextAt = step / 2, walked = 0;
+        for (const seg of route.coords) {
+            for (let i = 0; i < seg.length - 1; i++) {
+                const a = seg[i], b = seg[i + 1], d = map.distance(a, b);
+                if (d === 0) continue;
+                while (walked + d >= nextAt && pts.length < maxSamples + 2) {
+                    const f = (nextAt - walked) / d;
+                    pts.push([a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f]);
+                    nextAt += step;
+                }
+                walked += d;
+            }
+        }
+        return pts;
+    }
+
+    // jeden pixel -> trieda
+    function classifyPixel(r, g, b) {
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        const sat = max ? (max - min) / max : 0;
+        const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+        if (lum < 45) return 'shade';
+        if (g > r * 1.04 && g > b * 1.12 && sat > 0.12) return 'veg';
+        if (sat > 0.5) return 'other';                       // strechy, plachty, ...
+        if (sat < 0.14) return lum >= 175 ? 'light' : lum >= 70 ? 'asphalt' : 'shade';
+        if (r >= g && g >= b) return lum >= 150 ? 'light' : 'dirt';
+        return 'veg';
+    }
+
+    // okno okolo bodu -> 'asphalt' | 'light' | 'dirt' | 'covered'
+    function classifyWindow(data, ox, oy, half) {
+        const c = { asphalt: 0, light: 0, dirt: 0, rest: 0 };
+        let n = 0;
+        for (let dy = -half; dy <= half; dy++) {
+            for (let dx = -half; dx <= half; dx++) {
+                const x = Math.min(255, Math.max(0, Math.round(ox) + dx));
+                const y = Math.min(255, Math.max(0, Math.round(oy) + dy));
+                const i = (y * 256 + x) * 4;
+                const k = classifyPixel(data[i], data[i + 1], data[i + 2]);
+                if (k === 'asphalt' || k === 'light' || k === 'dirt') c[k]++; else c.rest++;
+                n++;
+            }
+        }
+        const road = c.asphalt + c.light + c.dirt;
+        if (road / n < 0.15) return 'covered';               // takmer všetko je vegetácia / tieň
+        return ['asphalt', 'light', 'dirt'].reduce((a, b) => c[b] > c[a] ? b : a, 'asphalt');
+    }
+
+    async function analyzeRouteSurface(route) {
+        const km = parseFloat(route.lengthKm);
+        const z = km > 5 ? 17 : 18;
+        const half = z === 18 ? 6 : 4;
+        const pts = samplePoints(route, 28);
+        if (pts.length < 3) return null;
+
+        const px = pts.map(([lat, lon]) => latLonToPx(lat, lon, z));
+        const keys = new Map();
+        px.forEach(([x, y]) => { const tx = Math.floor(x / 256), ty = Math.floor(y / 256); keys.set(`${tx}/${ty}`, [tx, ty]); });
+        const tiles = new Map();
+        await Promise.all([...keys].map(async ([k, [tx, ty]]) => tiles.set(k, await tileLoader(z, tx, ty))));
+
+        const counts = { asphalt: 0, light: 0, dirt: 0, covered: 0 };
+        let ok = 0;
+        px.forEach(([x, y]) => {
+            const tx = Math.floor(x / 256), ty = Math.floor(y / 256);
+            const data = tiles.get(`${tx}/${ty}`);
+            if (!data) return;
+            counts[classifyWindow(data, x - tx * 256, y - ty * 256, half)]++;
+            ok++;
+        });
+        if (ok < Math.max(3, pts.length * 0.5)) return null;     // snímky sa nepodarilo načítať
+
+        const visible = counts.asphalt + counts.light + counts.dirt;
+        const coverage = visible / ok;
+        let cls, share = 0;
+        if (coverage < 0.35) cls = 'covered';
+        else {
+            const top = ['asphalt', 'light', 'dirt'].reduce((a, b) => counts[b] > counts[a] ? b : a, 'asphalt');
+            share = counts[top] / visible;
+            cls = share < 0.5 ? 'mixed' : top === 'light' ? 'gravel' : top;
+        }
+        const conf = (coverage >= 0.6 && share >= 0.7) ? 'mid' : 'low';
+        return { cls, conf, share: +share.toFixed(2), coverage: +coverage.toFixed(2), n: ok, z };
+    }
+
+    /* uloženie výsledkov (IndexedDB) */
+    async function kvGet(key) {
+        try {
+            const db = await openDb();
+            return await new Promise(res => {
+                const q = db.transaction(STORE).objectStore(STORE).get(key);
+                q.onsuccess = () => res(q.result || null); q.onerror = () => res(null);
+            });
+        } catch { return null; }
+    }
+    async function kvSet(key, val) {
+        try {
+            const db = await openDb();
+            await new Promise(res => {
+                const tx = db.transaction(STORE, 'readwrite');
+                tx.objectStore(STORE).put(val, key);
+                tx.oncomplete = res; tx.onerror = res; tx.onabort = res;
+            });
+        } catch { /* len bonus */ }
+    }
+    let satSaveTimer = null;
+    function scheduleSatSave() { clearTimeout(satSaveTimer); satSaveTimer = setTimeout(() => kvSet(SAT_KEY, satResults), 1500); }
+
+    function updateRouteSurfaceUI(route) {
+        const info = surfaceInfo(route);
+        const card = document.getElementById(`card-${route.id}`);
+        if (card) {
+            const cell = card.querySelector('.surf-cell');
+            if (cell) cell.innerHTML = surfaceCellHtml(info);
+            const btn = card.querySelector('.btn-sat');
+            if (btn) {
+                if (info.src) btn.remove();
+                else { btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-satellite"></i> ${t('btn_sat')}`; btn.title = t('sat_failed'); }
+            }
+        }
+        const pl = polyById.get(route.id);
+        if (pl) pl.setPopupContent(popupHtml(route));
+    }
+
+    async function ensureSurface(route) {
+        if (osmSurfaceClass(route.surface) || satResults[route.id] || satBusy.has(route.id)) return;
+        satBusy.add(route.id);
+        const btn = document.querySelector(`#card-${route.id} .btn-sat`);
+        if (btn) { btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> …`; }
+        try {
+            const r = await analyzeRouteSurface(route);
+            if (r) { satResults[route.id] = r; satFailStreak = 0; scheduleSatSave(); }
+            else { satFailStreak++; console.warn('Satelitná analýza zlyhala pre', route.id); }
+        } catch (e) { satFailStreak++; console.warn(e); }
+        finally { satBusy.delete(route.id); updateRouteSurfaceUI(route); }
+    }
+
+    function satOne(id) {
+        const r = dataset.routes.find(x => x.id === id);
+        if (r) ensureSurface(r);
+    }
+
+    let batchRunning = false, batchCancel = false;
+    async function satAll() {
+        const btn = document.getElementById('btnSatAll');
+        if (batchRunning) { batchCancel = true; return; }
+        const todo = dataset.routes.filter(r => !osmSurfaceClass(r.surface) && !satResults[r.id]);
+        if (!todo.length) return;
+        if (!confirm(t('sat_confirm'))) return;
+        batchRunning = true; batchCancel = false; satFailStreak = 0;
+        let done = 0;
+        const queue = [...todo];
+        const worker = async () => {
+            while (queue.length && !batchCancel) {
+                if (satFailStreak >= 4) { batchCancel = true; alert(t('sat_failed')); break; }
+                await ensureSurface(queue.shift());
+                btn.innerHTML = `<i class="fa-solid fa-circle-stop"></i> ${++done}/${todo.length}`;
+            }
+        };
+        await Promise.all([worker(), worker()]);
+        batchRunning = false;
+        btn.innerHTML = '<i class="fa-solid fa-satellite"></i>';
+        kvSet(SAT_KEY, satResults);
+        filterAndRender(false);
+    }
+
     function highlightSingleRoute(selectedId, activePolyline) {
+        const rt = dataset.routes.find(r => r.id === selectedId);
+        if (rt) ensureSurface(rt);
         polylineLayerGroup.eachLayer(l => l.setStyle({ color: l.normalColor, weight: 4.5, opacity: 0.85 }));
         activePolyline.setStyle({ color: '#dc2626', weight: 9, opacity: 1.0 });
         activePolyline.bringToFront();
@@ -951,6 +1352,7 @@ out center tags;`;
     /* ---------- Stav ---------- */
     let lastStatus = 'loading';
     let lastError = '';
+    let attemptNo = 0;
     function updateStatus(type) {
         lastStatus = type;
         const b = document.getElementById('statusBadge');
@@ -968,7 +1370,9 @@ out center tags;`;
         const [cls, icon, text, extra] = map_[type] || map_.loading;
         b.className = `status-badge ${cls}`;
         b.title = lastError || '';
-        b.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${text}</span> ${extra}`;
+        const detail = (type !== 'success' && lastError)
+            ? `<div class="status-detail">⚠ ${esc(lastError)}${attemptNo ? ' · #' + attemptNo : ''}</div>` : '';
+        b.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${text}</span> ${extra}${detail}`;
     }
 
     function switchMobileTab(viewId, btn) {
@@ -993,13 +1397,14 @@ out center tags;`;
 
     /* =====================================================================
        RIADENIE NAČÍTANIA
-       1) uložené dáta (IndexedDB) -> okamžite
-       2) ak nie sú: statický súbor bardejov-data.json (ak ho nahráš vedľa stránky)
-       3) živé dáta z OSM: najprv trasy (hneď sa vykreslia), potom miesta
-       4) ak nič nejde: vrstva trás Waymarked Trails + hlavné miesta, opakované pokusy
+       1) uložené dáta (IndexedDB) a statický súbor bardejov-data.json -> okamžite, novšie vyhráva
+       2) živé dáta z OSM sa skúšajú donekonečna (max. 1 pokus/min), kým nepríde všetko
+          - najprv trasy (hneď sa vykreslia), potom miesta
+          - celá oblasť naraz, pri zlyhaní 4 menšie dlaždice
+       3) ak nič nejde: vrstva trás Waymarked Trails + hlavné miesta
     ===================================================================== */
     let realPois = [];
-    let routesFresh = false, poisFresh = false, landmarksStarted = false;
+    let routesFresh = false, routesComplete = false, poisFresh = false, poisComplete = false, landmarksStarted = false;
 
     function applyDataset(ds, fit) {
         dataset = { ts: ds.ts || Date.now(), routes: ds.routes || [], pois: ds.pois || [] };
@@ -1014,34 +1419,48 @@ out center tags;`;
         if (dataset.routes.length) cacheSet({ ts: dataset.ts, routes: dataset.routes, pois: realPois });
     }
 
+    // akceptuje hotový formát {routes,pois} aj surový formát zo skriptu fetch-data.mjs {routesRaw,poisRaw}
+    function datasetFromAny(ds) {
+        if (!ds) return null;
+        if (Array.isArray(ds.routes) && ds.routes.length) return { ts: ds.ts || 0, routes: ds.routes, pois: ds.pois || [] };
+        if (Array.isArray(ds.routesRaw)) {
+            const routes = parseRoutes(ds.routesRaw);
+            if (routes.length) return { ts: ds.ts || 1, routes, pois: parsePois(ds.poisRaw || []) };
+        }
+        return null;
+    }
+
     let refreshRunning = false;
-    async function refreshLive(maxAttempts = 6) {
+    async function refreshLive() {
         if (refreshRunning) return;
         refreshRunning = true;
         try {
-            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-                if (!routesFresh) {
+            for (let attempt = 1; ; attempt++) {
+                attemptNo = attempt;
+                if (!routesFresh || !routesComplete) {
                     try {
-                        const routes = await fetchRoutes();
+                        const { items, complete } = await fetchTiled(routesQueryFor, parseRoutes, 'trasy');
                         const first = !hasData || landmarkMode;
-                        dataset.routes = routes; dataset.ts = Date.now();
-                        hasData = true; landmarkMode = false; routesFresh = true;
+                        dataset.routes = items; dataset.ts = Date.now();
+                        hasData = true; landmarkMode = false; routesFresh = true; routesComplete = complete;
                         if (autoOverlay) setFallbackOverlays(false);
                         filterAndRender(first);
-                        updateStatus('partial');
                         persist();
                     } catch (e) { lastError = e.message; console.warn('Trasy zlyhali:', e); }
                 }
-                if (!poisFresh) {
+                if (!poisFresh || !poisComplete) {
                     try {
-                        const pois = await fetchPois();
-                        realPois = pois; dataset.pois = pois; landmarkMode = false; poisFresh = true;
+                        const { items, complete } = await fetchTiled(poiQueryFor, parsePois, 'miesta');
+                        realPois = items; dataset.pois = items; landmarkMode = false;
+                        poisFresh = true; poisComplete = complete;
                         renderPois();
                         persist();
                     } catch (e) { lastError = e.message; console.warn('Miesta zlyhali:', e); }
                 }
 
-                if (routesFresh && poisFresh) { updateStatus('success'); return; }
+                if (routesFresh && routesComplete && poisFresh && poisComplete) {
+                    lastError = ''; updateStatus('success'); return;
+                }
 
                 // nič sa nepodarilo načítať -> aspoň záložná vrstva trás a hlavné miesta
                 if (!hasData && !landmarksStarted) {
@@ -1057,40 +1476,34 @@ out center tags;`;
                             updateStatus('landmarks');
                         }
                     });
-                    updateStatus('landmarks');
                 }
+                updateStatus(routesFresh ? 'partial' : (hasData ? 'cache' : 'landmarks'));
                 await sleep(Math.min(60000, 5000 * attempt));
             }
-            if (routesFresh) updateStatus('success');
-            else updateStatus(hasData ? 'cache' : (landmarkMode || autoOverlay ? 'landmarks' : 'error'));
         } finally { refreshRunning = false; }
     }
 
     function retryNow() {
         updateStatus(hasData ? 'refreshing' : 'loading');
-        refreshLive(6);
+        refreshLive();
     }
 
-    window.addEventListener('online', () => { if (!refreshRunning && !(routesFresh && poisFresh)) retryNow(); });
+    window.addEventListener('online', () => { if (!refreshRunning) retryNow(); });
 
     async function init() {
         updateStatus('loading');
 
-        const cached = await cacheGet();
-        if (validDataset(cached)) {
-            applyDataset(cached, true);
-            updateStatus('refreshing');
-        } else {
-            try {
-                const res = await fetch('bardejov-data.json', { cache: 'no-cache' });
-                if (res.ok) {
-                    const ds = await res.json();
-                    if (validDataset(ds)) { applyDataset(ds, true); updateStatus('refreshing'); }
-                }
-            } catch { /* súbor neexistuje – nevadí */ }
-        }
+        satResults = (await kvGet(SAT_KEY)) || {};
 
-        refreshLive(6);
+        const [cached, stat] = await Promise.all([
+            cacheGet().then(datasetFromAny),
+            fetch('bardejov-data.json', { cache: 'no-cache' })
+                .then(r => r.ok ? r.json() : null).catch(() => null).then(datasetFromAny)
+        ]);
+        const best = [cached, stat].filter(Boolean).sort((a, b) => (b.ts || 0) - (a.ts || 0))[0];
+        if (best) { applyDataset(best, true); updateStatus('refreshing'); }
+
+        refreshLive();
     }
 
     init();

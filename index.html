@@ -2,7 +2,7 @@
 <html lang="sk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kompletný Geoportál Okresu Bardejov – Cyklo, Turistika, Kataster</title>
     
     <!-- Leaflet CSS -->
@@ -23,8 +23,7 @@
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border-radius: 16px;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
-            --shadow-hover: 0 20px 30px -10px rgba(0, 0, 0, 0.12);
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
 
         * {
@@ -32,7 +31,6 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            scroll-behavior: smooth;
         }
 
         body {
@@ -44,102 +42,43 @@
         header {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #064e3b 100%);
             color: white;
-            padding: clamp(2rem, 5vw, 3.5rem) 1.25rem;
+            padding: 2rem 1.25rem;
             text-align: center;
         }
 
         header h1 {
-            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
             font-weight: 800;
-            letter-spacing: -0.02em;
             margin-bottom: 0.5rem;
         }
 
         header p {
-            font-size: clamp(0.95rem, 2vw, 1.15rem);
             color: #94a3b8;
             max-width: 800px;
             margin: 0 auto;
         }
 
-        nav {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 1.25rem;
-        }
-
-        .nav-brand {
-            font-weight: 800;
-            color: var(--primary);
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 0.5rem;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: var(--text-main);
-            font-weight: 600;
-            font-size: 0.9rem;
-            padding: 0.5rem 0.9rem;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-
-        nav a:hover {
-            background: #f1f5f9;
-            color: var(--accent-bike);
-        }
-
         .container {
             max-width: 1400px;
-            margin: 2rem auto;
+            margin: 1.5rem auto;
             padding: 0 1.25rem;
-        }
-
-        .section-title {
-            font-size: clamp(1.3rem, 3vw, 1.8rem);
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
         }
 
         .map-wrapper {
             display: grid;
-            grid-template-columns: 1fr 340px;
+            grid-template-columns: 1fr 320px;
             gap: 1.25rem;
             background: var(--card-bg);
             padding: 1rem;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
             border: 1px solid #e2e8f0;
         }
 
         #map {
-            height: clamp(480px, 72vh, 800px);
+            height: 75vh;
+            min-height: 500px;
             width: 100%;
             border-radius: 12px;
             z-index: 1;
@@ -154,65 +93,39 @@
         .control-box {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            padding: 1.2rem;
+            padding: 1rem;
             border-radius: 12px;
         }
 
         .control-box h4 {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--text-muted);
             margin-bottom: 0.8rem;
         }
 
-        .filter-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
         .filter-btn {
             width: 100%;
-            padding: 0.75rem 1rem;
+            padding: 0.65rem 0.85rem;
+            margin-bottom: 0.4rem;
             border: 1px solid #cbd5e1;
             background: white;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
             color: var(--text-main);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
+            font-size: 0.85rem;
+            transition: all 0.2s;
         }
 
-        .filter-btn:hover {
-            border-color: var(--primary);
-            background: #f1f5f9;
-        }
-
-        .filter-btn.active {
+        .filter-btn:hover, .filter-btn.active {
             background: var(--primary);
             color: white;
             border-color: var(--primary);
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            font-size: 0.85rem;
-            margin-bottom: 0.4rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .legend-color {
-            width: 18px;
-            height: 5px;
-            border-radius: 3px;
         }
 
         .status-badge {
@@ -227,148 +140,57 @@
             font-weight: 600;
         }
 
-        .status-badge.loading i {
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
         .routes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.25rem;
             margin-bottom: 3rem;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 5px;
         }
 
         .route-card {
             background: var(--card-bg);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
+            border-radius: 12px;
             border: 1px solid #e2e8f0;
-            overflow: hidden;
+            padding: 1rem;
             display: flex;
             flex-direction: column;
-            transition: transform 0.2s, box-shadow 0.2s;
-            scroll-margin-top: 90px;
-        }
-
-        .route-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .route-card.highlighted {
-            border: 2px solid var(--accent-hike);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
-        }
-
-        .card-header {
-            padding: 1rem 1.25rem;
-            color: white;
-            display: flex;
             justify-content: space-between;
-            align-items: center;
         }
 
-        .card-header.bike { background: linear-gradient(135deg, #059669, #10b981); }
-        .card-header.hike { background: linear-gradient(135deg, #1d4ed8, #3b82f6); }
-        .card-header.single { background: linear-gradient(135deg, #b45309, #f59e0b); }
-
-        .card-header h3 {
-            font-size: 1rem;
+        .route-card h3 {
+            font-size: 0.95rem;
             font-weight: 700;
-            line-height: 1.3;
+            margin-bottom: 0.4rem;
         }
 
-        .badge {
-            font-size: 0.7rem;
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-            font-weight: 700;
-            text-transform: uppercase;
-            background: rgba(255, 255, 255, 0.25);
-            white-space: nowrap;
-        }
-
-        .card-body {
-            padding: 1.25rem;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        .card-desc {
+        .route-card-meta {
+            font-size: 0.8rem;
             color: var(--text-muted);
-            font-size: 0.875rem;
-            margin-bottom: 1.2rem;
-            flex-grow: 1;
-        }
-
-        .card-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            background: #f8fafc;
-            border-radius: 10px;
-            padding: 0.75rem;
-            text-align: center;
-            margin-bottom: 1rem;
-            border: 1px solid #e2e8f0;
-        }
-
-        .stat-val {
-            font-weight: 800;
-            color: var(--primary);
-            font-size: 0.875rem;
-            display: block;
-        }
-
-        .stat-lbl {
-            font-size: 0.68rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: 600;
+            margin-bottom: 0.8rem;
         }
 
         .btn-focus {
             width: 100%;
-            padding: 0.7rem;
+            padding: 0.5rem;
             background: #f1f5f9;
             border: 1px solid #cbd5e1;
-            border-radius: 10px;
+            border-radius: 6px;
             color: var(--primary);
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            transition: all 0.2s;
         }
 
         .btn-focus:hover {
             background: var(--primary);
             color: white;
-            border-color: var(--primary);
-        }
-
-        footer {
-            background: var(--primary);
-            color: white;
-            padding: 2.5rem 1.25rem;
-            text-align: center;
-        }
-
-        footer p {
-            color: #94a3b8;
-            font-size: 0.875rem;
-            margin-top: 0.5rem;
         }
 
         @media (max-width: 992px) {
-            .map-wrapper {
-                grid-template-columns: 1fr;
-            }
+            .map-wrapper { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -376,125 +198,90 @@
 
     <header>
         <h1>Geoportál Okresu Bardejov</h1>
-        <p>Integrácia OSM Cyklomáp, Google Máp, Mapy.cz / Outdooru a Katastrálnych podkladov s kompletnou sieťou trás</p>
+        <p>Reálne GIS dáta reálnych trás z OpenStreetMap na cyklomapách, Mapy.cz a katastrálnom podklade</p>
     </header>
-
-    <nav>
-        <div class="nav-container">
-            <div class="nav-brand">
-                <i class="fa-solid fa-map-location-dot"></i> Bardejov MultiMap GIS
-            </div>
-            <ul class="nav-links">
-                <li><a href="#mapa">Mapa</a></li>
-                <li><a href="#katalog">Katalóg trás</a></li>
-            </ul>
-        </div>
-    </nav>
 
     <div class="container">
 
-        <section id="mapa">
-            <h2 class="section-title"><i class="fa-solid fa-layer-group"></i> Interaktívna Multi-Mapová Vrstva</h2>
-            <div class="map-wrapper">
-                <div id="map"></div>
-                <div class="map-sidebar">
-                    <div class="control-box">
-                        <h4>Stav geodát</h4>
-                        <div id="statusBadge" class="status-badge loading">
-                            <i class="fa-solid fa-spinner"></i> Načítavam všetky trasy...
-                        </div>
-                    </div>
-
-                    <div class="control-box">
-                        <h4>Filtrovať kategórie</h4>
-                        <div class="filter-grid">
-                            <button class="filter-btn active" onclick="filterData('all', this)">
-                                <span>Všetky trasy</span> <i class="fa-solid fa-layer-group"></i>
-                            </button>
-                            <button class="filter-btn" onclick="filterData('bike', this)">
-                                <span>Cyklotrasy</span> <i class="fa-solid fa-person-biking"></i>
-                            </button>
-                            <button class="filter-btn" onclick="filterData('hike', this)">
-                                <span>Turistika</span> <i class="fa-solid fa-person-hiking"></i>
-                            </button>
-                            <button class="filter-btn" onclick="filterData('single', this)">
-                                <span>Singletracky</span> <i class="fa-solid fa-mountain"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="control-box">
-                        <h4>Legenda mapy</h4>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #059669;"></div>
-                            <span>Cyklotrasy</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #2563eb;"></div>
-                            <span>Turistické chodníky</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #d97706;"></div>
-                            <span>Singletracky & MTB</span>
-                        </div>
+        <div class="map-wrapper">
+            <div id="map"></div>
+            <div class="map-sidebar">
+                <div class="control-box">
+                    <h4>Stav geodát</h4>
+                    <div id="statusBadge" class="status-badge">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Načítavam reálne dáta...
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <section id="katalog">
-            <h2 class="section-title"><i class="fa-solid fa-route"></i> Zoznam Načítaných Trás z Okresu Bardejov</h2>
-            <div class="routes-grid" id="routes-container"></div>
-        </section>
+                <div class="control-box">
+                    <h4>Filtrovať vrstvy</h4>
+                    <button class="filter-btn active" onclick="filterData('all', this)">
+                        <span>Všetky trasy</span> <i class="fa-solid fa-layer-group"></i>
+                    </button>
+                    <button class="filter-btn" onclick="filterData('bike', this)">
+                        <span>Cyklotrasy</span> <i class="fa-solid fa-person-biking"></i>
+                    </button>
+                    <button class="filter-btn" onclick="filterData('hike', this)">
+                        <span>Turistika</span> <i class="fa-solid fa-person-hiking"></i>
+                    </button>
+                    <button class="filter-btn" onclick="filterData('single', this)">
+                        <span>Singletrack / MTB</span> <i class="fa-solid fa-mountain"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <h2 style="margin-bottom: 1rem;"><i class="fa-solid fa-route"></i> Zoznam načítaných trás v okrese (<span id="routeCount">0</span>)</h2>
+        <div class="routes-grid" id="routes-container"></div>
 
     </div>
 
-    <footer>
-        <p><strong>Geografický informačný portál okresu Bardejov</strong></p>
-        <p>Prepojenie geodát OpenStreetMap, Google Maps, Mapy.cz a ZBGIS Katastrálnych podkladov.</p>
-    </footer>
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // INITIALIZE MAP (Focused on Bardejov & surroundings)
-        const map = L.map('map').setView([49.29356, 21.25091], 13);
+        // Stred okresu Bardejov
+        const map = L.map('map').setView([49.29356, 21.25091], 12);
 
-        // MAP TILE LAYERS (MULTIPLE MAP SOURCES)
+        // 1. OSM Cyklomapa (CyclOSM)
         const cykloOsmLayer = L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', {
             maxZoom: 20,
             attribution: '&copy; OpenStreetMap & CyclOSM'
         });
 
+        // 2. OpenStreetMap Standard
         const osmStandard = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '&copy; OpenStreetMap prispievatelia'
+            attribution: '&copy; OpenStreetMap'
         });
 
+        // 3. Google Satelit
         const googleSatellite = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
             maxZoom: 20,
-            attribution: '&copy; Google Maps Satelit'
+            attribution: '&copy; Google Maps'
         });
 
+        // 4. Google Hybrid
         const googleHybrid = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
             maxZoom: 20,
-            attribution: '&copy; Google Maps Hybrid'
+            attribution: '&copy; Google Maps'
         });
 
+        // 5. Mapy.cz Outdoor / Turistická
         const outdoorMapyCz = L.tileLayer('https://m{s}.mapserver.mapy.cz/turist-m/{z}-{x}-{y}', {
             subdomains: '1234',
             maxZoom: 18,
             attribution: '&copy; Mapy.cz / Seznam.cz'
         });
 
+        // 6. Topografický / Katastrálny podklad (ArcGIS / ZBGIS style)
         const katasterLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 19,
-            attribution: '&copy; Katastrálne / Topografické podklady ZBGIS'
+            attribution: '&copy; ZBGIS / Esri Topo'
         });
 
-        // Set default layer to CyclOSM (Cycle Map Layer)
+        // Nastavenie výchozej vrstvy - Cyklomapa
         cykloOsmLayer.addTo(map);
 
-        // MAP LAYER SWITCHER CONTROL
+        // Prepínač podkladov v pravom hornom rohu
         const baseMaps = {
             "🚴 OSM Cyklomapa (CyclOSM)": cykloOsmLayer,
             "🥾 Outdoor / Turistická (Mapy.cz)": outdoorMapyCz,
@@ -506,20 +293,122 @@
 
         L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
-        let allRoutes = [];
-        let mapLayers = {};
-        let currentFilter = 'all';
+        let loadedRoutes = [];
+        let leafletLayerGroup = L.layerGroup().addTo(map);
+        let activeFilter = 'all';
 
-        function calculateLength(latlngs) {
-            let totalDistance = 0;
+        // Výpočet dĺžky z reálnych súradníc
+        function calculateDistance(latlngs) {
+            let total = 0;
             for (let i = 0; i < latlngs.length - 1; i++) {
-                totalDistance += latlngs[i].distanceTo(latlngs[i + 1]);
+                total += latlngs[i].distanceTo(latlngs[i + 1]);
             }
-            return (totalDistance / 1000).toFixed(1);
+            return (total / 1000).toFixed(2);
         }
 
-        function getCategoryColor(category) {
-            switch(category) {
+        // NAČÍTANIE SKUTOČNÝCH TRÁS CEZ OVERPASS API (REÁLNA GEOMETRIA CHODNÍKOV A CIEST)
+        async function fetchRealDistrictData() {
+            const statusBadge = document.getElementById('statusBadge');
+            
+            // Bounding box pre Bardejov a širšie okolie
+            const bbox = "49.18,21.10,49.40,21.45";
+
+            // Overpass QL dotaz na získanie reálnych cyklotrás, turistických chodníkov a singletrackov
+            const query = `
+                [out:json][timeout:25];
+                (
+                  relation["route"="bicycle"](${bbox});
+                  relation["route"="hiking"](${bbox});
+                  relation["route"="foot"](${bbox});
+                  way["highway"="cycleway"](${bbox});
+                  way["mtb:scale"](${bbox});
+                );
+                out body;
+                >;
+                out skel qt;
+            `;
+
+            try {
+                const response = await fetch("https://overpass-api.de/api/interpreter", {
+                    method: "POST",
+                    body: "data=" + encodeURIComponent(query)
+                });
+
+                const data = await response.json();
+
+                // 1. Uloženie všetkých bodov (nodes)
+                const nodes = {};
+                data.elements.forEach(el => {
+                    if (el.type === 'node') {
+                        nodes[el.id] = L.latLng(el.lat, el.lon);
+                    }
+                });
+
+                // 2. Spracovanie ciest (ways)
+                const ways = {};
+                data.elements.forEach(el => {
+                    if (el.type === 'way' && el.nodes) {
+                        ways[el.id] = el.nodes.map(nid => nodes[nid]).filter(n => n !== undefined);
+                    }
+                });
+
+                // 3. Spracovanie relácií aj samostatných ciest do reálnych línií
+                let routeIdCounter = 1;
+
+                data.elements.forEach(el => {
+                    let category = 'hike';
+                    let name = el.tags?.name || el.tags?.ref || '';
+
+                    if (el.tags?.route === 'bicycle' || el.tags?.highway === 'cycleway' || el.tags?.bicycle === 'yes') {
+                        category = 'bike';
+                    } else if (el.tags?.['mtb:scale'] || el.tags?.designation === 'singletrack') {
+                        category = 'single';
+                    }
+
+                    if (!name) {
+                        name = category === 'bike' ? `Cyklotrasa #${routeIdCounter}` : 
+                              (category === 'single' ? `Singletrack #${routeIdCounter}` : `Turistický chodník #${routeIdCounter}`);
+                    }
+
+                    let lineSegments = [];
+
+                    if (el.type === 'relation' && el.members) {
+                        el.members.forEach(m => {
+                            if (m.type === 'way' && ways[m.ref]) {
+                                lineSegments.push(ways[m.ref]);
+                            }
+                        });
+                    } else if (el.type === 'way' && ways[el.id]) {
+                        lineSegments.push(ways[el.id]);
+                    }
+
+                    lineSegments.forEach((segment) => {
+                        if (segment.length > 1) {
+                            const dist = calculateDistance(segment);
+                            if (parseFloat(dist) > 0.1) {
+                                loadedRoutes.push({
+                                    id: `r-${routeIdCounter++}`,
+                                    name: name,
+                                    category: category,
+                                    length: `${dist} km`,
+                                    latlngs: segment
+                                });
+                            }
+                        }
+                    });
+                });
+
+                statusBadge.innerHTML = `<i class="fa-solid fa-check" style="color:#059669;"></i> Načítaných ${loadedRoutes.length} reálnych úsekov`;
+                renderMapAndList();
+
+            } catch (err) {
+                console.error("Chyba pri načítavaní z OpenStreetMap API:", err);
+                statusBadge.innerHTML = `<i class="fa-solid fa-circle-exclamation" style="color:#dc2626;"></i> Chyba pri načítaní dát`;
+            }
+        }
+
+        function getCategoryColor(cat) {
+            switch(cat) {
                 case 'bike': return '#059669';
                 case 'hike': return '#2563eb';
                 case 'single': return '#d97706';
@@ -527,269 +416,75 @@
             }
         }
 
-        // FETCH ALL ROUTES IN DISTRICT BOUNDS FROM OVERPASS API
-        async function fetchAllDistrictRoutes() {
-            const statusBadge = document.getElementById('statusBadge');
-            
-            // Bounding box around Bardejov District
-            const bbox = "49.15,21.05,49.45,21.50";
-            const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json][timeout:35];(relation["route"="bicycle"](${bbox});relation["route"="foot"](${bbox});relation["route"="hiking"](${bbox});way["mtb:scale"](${bbox});way["highway"~"path|track"](${bbox}););out body;>;out skel qt;`;
-
-            try {
-                const response = await fetch(overpassUrl);
-                const data = await response.json();
-                
-                const nodes = {};
-                data.elements.forEach(el => {
-                    if (el.type === 'node') {
-                        nodes[el.id] = [el.lat, el.lon];
-                    }
-                });
-
-                let routeCounter = 1;
-
-                data.elements.forEach(el => {
-                    if ((el.type === 'way' || el.type === 'relation') && el.nodes && el.nodes.length > 1) {
-                        const coords = el.nodes.map(nodeId => nodes[nodeId]).filter(c => c !== undefined);
-                        if (coords.length < 2) return;
-
-                        const tags = el.tags || {};
-                        let category = 'hike';
-                        let name = tags.name || tags.ref || `Trasa okresu Bardejov #${routeCounter++}`;
-
-                        if (tags.route === 'bicycle' || tags.bicycle === 'yes' || tags.highway === 'cycleway') {
-                            category = 'bike';
-                        }
-                        if (tags['mtb:scale'] || (tags.description && tags.description.toLowerCase().includes('single'))) {
-                            category = 'single';
-                        }
-
-                        const leafletCoords = coords.map(c => L.latLng(c[0], c[1]));
-                        const routeLen = calculateLength(leafletCoords);
-
-                        if (parseFloat(routeLen) > 0.3) {
-                            allRoutes.push({
-                                id: `route-${el.id}`,
-                                name: name,
-                                category: category,
-                                difficulty: parseFloat(routeLen) > 12 ? 'Náročná' : (parseFloat(routeLen) > 6 ? 'Stredná' : 'Ľahká'),
-                                length: `${routeLen} km`,
-                                eleGain: `+${Math.round(parseFloat(routeLen) * 20)} m`,
-                                time: `${Math.round(parseFloat(routeLen) * 12)} min`,
-                                desc: tags.description || tags.note || `Oficiálna trasa v okrese Bardejov overená v GIS podkladoch.`,
-                                coords: coords
-                            });
-                        }
-                    }
-                });
-
-                if (allRoutes.length === 0) {
-                    loadFallbackData();
-                }
-
-                statusBadge.className = 'status-badge';
-                statusBadge.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#059669;"></i> Načítaných ${allRoutes.length} trás z okresu`;
-
-                renderMapRoutes(currentFilter);
-                renderCards(currentFilter);
-
-            } catch (error) {
-                console.warn("Chyba API, načítavam kompletnú lokálnu databázu okresu Bardejov", error);
-                loadFallbackData();
-            }
-        }
-
-        function loadFallbackData() {
-            allRoutes = [
-                {
-                    id: "route-1",
-                    name: "Cyklochodník Bardejov - Bardejovské Kúpele",
-                    category: "bike",
-                    difficulty: "Ľahká",
-                    length: "5.2 km",
-                    eleGain: "+70 m",
-                    time: "20 min",
-                    desc: "Asfaltový cyklochodník spájajúci mesto Bardejov s kúpeľným areálom.",
-                    coords: [[49.2917, 21.2727], [49.2965, 21.2750], [49.3031, 21.2801], [49.3105, 21.2825], [49.3180, 21.2780], [49.3245, 21.2720]]
-                },
-                {
-                    id: "route-2",
-                    name: "Cyklotrasa Bardejov - Hervartov (UNESCO)",
-                    category: "bike",
-                    difficulty: "Stredná",
-                    length: "10.8 km",
-                    eleGain: "+180 m",
-                    time: "45 min",
-                    desc: "Trasa vedúca z Bardejova k najstaršiemu drevenému kostolíku na Slovensku v Hervartove.",
-                    coords: [[49.2917, 21.2727], [49.2810, 21.2610], [49.2705, 21.2480], [49.2600, 21.2330], [49.2480, 21.2060]]
-                },
-                {
-                    id: "route-3",
-                    name: "Rodinný Singletrack (Cyklostopy Bardejov)",
-                    category: "single",
-                    difficulty: "Ľahká",
-                    length: "3.1 km",
-                    eleGain: "+95 m",
-                    time: "15 min",
-                    desc: "Prírodný singletrack nad Bardejovskými Kúpeľmi navrhnutý pre rodiny a začiatočníkov.",
-                    coords: [[49.3250, 21.2720], [49.3275, 21.2680], [49.3301, 21.2650], [49.3315, 21.2690], [49.3280, 21.2730], [49.3250, 21.2720]]
-                },
-                {
-                    id: "route-4",
-                    name: "Chergof Singletrack (Cyklostopy Bardejov)",
-                    category: "single",
-                    difficulty: "Náročná",
-                    length: "4.5 km",
-                    eleGain: "+210 m",
-                    time: "25 min",
-                    desc: "Technický enduro trail v lesoch Čergova s klopenými zákrutami a drevenými lávkami.",
-                    coords: [[49.3280, 21.2600], [49.3320, 21.2540], [49.3360, 21.2480], [49.3390, 21.2520], [49.3330, 21.2590]]
-                },
-                {
-                    id: "route-5",
-                    name: "Turistika: Hervartov - Rozhľadňa Žobrák",
-                    category: "hike",
-                    difficulty: "Stredná",
-                    length: "8.2 km",
-                    eleGain: "+530 m",
-                    time: "2h 40m",
-                    desc: "Červená turistická značka vystupujúca z Hervartova na vrch Žobrák s vyhliadkovými vežami.",
-                    coords: [[49.2480, 21.2060], [49.2390, 21.1920], [49.2310, 21.1750], [49.2220, 21.1590], [49.2155, 21.1460]]
-                },
-                {
-                    id: "route-6",
-                    name: "Turistika: Bardejovské Kúpele - Zborovský Hrad",
-                    category: "hike",
-                    difficulty: "Ľahká",
-                    length: "9.5 km",
-                    eleGain: "+240 m",
-                    time: "2h 20m",
-                    desc: "Obľúbená turistická trasa spájajúca kúpele so zrúcaninou hradu Zborov.",
-                    coords: [[49.3250, 21.2720], [49.3380, 21.2850], [49.3480, 21.2980], [49.3540, 21.3060]]
-                }
-            ];
-
-            const statusBadge = document.getElementById('statusBadge');
-            statusBadge.className = 'status-badge';
-            statusBadge.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#059669;"></i> Načítaných ${allRoutes.length} trás`;
-
-            renderMapRoutes(currentFilter);
-            renderCards(currentFilter);
-        }
-
-        function renderMapRoutes(filter = 'all') {
-            Object.values(mapLayers).forEach(layer => map.removeLayer(layer));
-            mapLayers = {};
-
-            allRoutes.forEach(route => {
-                if (filter === 'all' || route.category === filter) {
-                    const color = getCategoryColor(route.category);
-                    
-                    const polyline = L.polyline(route.coords, {
-                        color: color,
-                        weight: 5,
-                        opacity: 0.85,
-                        lineCap: 'round',
-                        lineJoin: 'round'
-                    }).addTo(map);
-
-                    polyline.bindPopup(`
-                        <div style="font-family:'Plus Jakarta Sans', sans-serif;">
-                            <h4 style="margin:0 0 4px; color:#0f172a;">${route.name}</h4>
-                            <p style="margin:0 0 8px; font-size:0.8rem; color:#64748b;"><b>Dĺžka:</b> ${route.length} | <b>Stúpanie:</b> ${route.eleGain}</p>
-                            <button onclick="scrollToCard('${route.id}')" style="background:#0f172a; color:white; border:none; padding:6px 10px; border-radius:6px; font-size:0.75rem; cursor:pointer; width:100%; font-weight:700;">
-                                Zobraziť kartu trás ↓
-                            </button>
-                        </div>
-                    `);
-
-                    polyline.on('click', () => {
-                        highlightCard(route.id);
-                    });
-
-                    mapLayers[route.id] = polyline;
-                }
-            });
-        }
-
-        function renderCards(filter = 'all') {
+        function renderMapAndList() {
+            leafletLayerGroup.clearLayers();
             const container = document.getElementById('routes-container');
             container.innerHTML = '';
 
-            allRoutes.forEach(route => {
-                if (filter === 'all' || route.category === filter) {
+            let visibleCount = 0;
+
+            loadedRoutes.forEach(route => {
+                if (activeFilter === 'all' || route.category === activeFilter) {
+                    visibleCount++;
+                    const color = getCategoryColor(route.category);
+
+                    // Zakreslenie PRESNEJ geometrie do mapy
+                    const polyline = L.polyline(route.latlngs, {
+                        color: color,
+                        weight: 4,
+                        opacity: 0.85
+                    });
+
+                    polyline.bindPopup(`
+                        <b>${route.name}</b><br>
+                        Dĺžka úseku: ${route.length}<br>
+                        Kategória: ${route.category.toUpperCase()}
+                    `);
+
+                    leafletLayerGroup.addLayer(polyline);
+
+                    // Pridanie karty do zoznamu
                     const card = document.createElement('div');
                     card.className = 'route-card';
-                    card.id = route.id;
-
-                    let catLabel = 'Cyklotrasa';
-                    if (route.category === 'hike') catLabel = 'Turistika';
-                    if (route.category === 'single') catLabel = 'Singletrack';
-
                     card.innerHTML = `
-                        <div class="card-header ${route.category}">
+                        <div>
                             <h3>${route.name}</h3>
-                            <span class="badge">${catLabel}</span>
-                        </div>
-                        <div class="card-body">
-                            <p class="card-desc">${route.desc}</p>
-                            <div class="card-stats">
-                                <div>
-                                    <span class="stat-val">${route.length}</span>
-                                    <span class="stat-lbl">Dĺžka</span>
-                                </div>
-                                <div>
-                                    <span class="stat-val">${route.eleGain}</span>
-                                    <span class="stat-lbl">Stúpanie</span>
-                                </div>
-                                <div>
-                                    <span class="stat-val">${route.time}</span>
-                                    <span class="stat-lbl">Čas</span>
-                                </div>
+                            <div class="route-card-meta">
+                                <span>Typ: <b>${route.category}</b></span> | 
+                                <span>Dĺžka: <b>${route.length}</b></span>
                             </div>
-                            <button class="btn-focus" onclick="focusOnMap('${route.id}')">
-                                <i class="fa-solid fa-crosshairs"></i> Nájsť na mape
-                            </button>
                         </div>
+                        <button class="btn-focus" onclick="focusRoute('${route.id}')">
+                            <i class="fa-solid fa-crosshairs"></i> Zobraziť na mape
+                        </button>
                     `;
                     container.appendChild(card);
+
+                    route.leafletRef = polyline;
                 }
             });
+
+            document.getElementById('routeCount').innerText = visibleCount;
         }
 
-        function scrollToCard(routeId) {
-            const card = document.getElementById(routeId);
-            if (card) {
-                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                highlightCard(routeId);
+        function focusRoute(routeId) {
+            const route = loadedRoutes.find(r => r.id === routeId);
+            if (route && route.leafletRef) {
+                map.fitBounds(route.leafletRef.getBounds(), { padding: [40, 40] });
+                route.leafletRef.openPopup();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
-        function highlightCard(routeId) {
-            document.querySelectorAll('.route-card').forEach(c => c.classList.remove('highlighted'));
-            const card = document.getElementById(routeId);
-            if (card) card.classList.add('highlighted');
+        function filterData(filter, btn) {
+            activeFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderMapAndList();
         }
 
-        function focusOnMap(routeId) {
-            const layer = mapLayers[routeId];
-            if (layer) {
-                map.fitBounds(layer.getBounds(), { padding: [50, 50] });
-                layer.openPopup();
-                document.getElementById('mapa').scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
-        function filterData(type, btnElement) {
-            currentFilter = type;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            btnElement.classList.add('active');
-            
-            renderMapRoutes(type);
-            renderCards(type);
-        }
-
-        fetchAllDistrictRoutes();
+        // Spustenie pri načítaní stránky
+        fetchRealDistrictData();
     </script>
 </body>
 </html>

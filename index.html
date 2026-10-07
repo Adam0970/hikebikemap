@@ -2,409 +2,639 @@
 <html lang="sk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO Geoportál Bardejov – Cyklo & Turistika</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Bardejov GIS Geoportál – Cyklo, Turistika, Kataster & Satelit</title>
+
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Font Awesome -->
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --primary: #1e293b;
-            --secondary: #334155;
-            --accent-bike: #10b981;  /* Emerald */
-            --accent-hike: #3b82f6;  /* Blue */
-            --accent-single: #f59e0b; /* Amber */
-            --bg-light: #f8fafc;
+            --primary: #0f172a;
+            --primary-light: #1e293b;
+            --accent-bike: #10b981;
+            --accent-hike: #3b82f6;
+            --accent-single: #f59e0b;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
             --border: #e2e8f0;
-            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            --radius: 12px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        
-        body { background-color: var(--bg-light); color: var(--primary); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); overflow-x: hidden; }
 
+        /* HEADER & TOPBAR */
         header {
-            background: #0f172a;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #064e3b 100%);
             color: white;
-            padding: 2rem 5%;
-            text-align: center;
-            border-bottom: 4px solid var(--accent-bike);
-        }
-
-        header h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.5rem; }
-        header p { color: #94a3b8; font-size: 1.1rem; max-width: 800px; margin: 0 auto; }
-
-        .dashboard {
-            max-width: 1600px;
-            margin: 2rem auto;
-            padding: 0 2%;
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 1.5rem;
-            align-items: start;
-        }
-
-        /* SIDEBAR / FILTERS */
-        .panel {
-            background: white;
-            border-radius: var(--radius);
+            padding: 1.25rem 2rem;
             box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
-            padding: 1.5rem;
-            position: sticky;
-            top: 2rem;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
         }
 
-        .panel-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
-        
-        .loading-box {
-            background: #f1f5f9;
-            padding: 1rem;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #cbd5e1;
-        }
-
-        .loading-box.success { background: #dcfce7; color: #166534; border-color: #86efac; }
-        .loading-box.error { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
-
-        .filter-group { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
-        
-        .btn-filter {
-            background: white;
-            border: 1px solid var(--border);
-            padding: 0.8rem 1rem;
-            border-radius: 8px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--secondary);
-            cursor: pointer;
-            transition: all 0.2s;
+        .header-container {
+            max-width: 1800px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
-        
-        .btn-filter:hover { border-color: var(--primary); background: #f8fafc; }
-        .btn-filter.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        .catalog-scroll {
-            flex-grow: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-            padding-right: 5px;
+        .brand-box { display: flex; align-items: center; gap: 0.8rem; }
+        .brand-icon {
+            width: 44px; height: 44px; background: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--accent-bike); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--accent-bike); font-size: 1.4rem;
         }
-        
-        /* Custom Scrollbar */
-        .catalog-scroll::-webkit-scrollbar { width: 6px; }
-        .catalog-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-        .catalog-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        
+
+        .brand-text h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+        .brand-text p { font-size: 0.82rem; color: #94a3b8; }
+
+        .top-controls { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+
+        .stats-ticker {
+            display: flex; gap: 1.2rem; background: rgba(255,255,255,0.08);
+            padding: 0.5rem 1rem; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .stat-item { text-align: center; }
+        .stat-item .val { font-weight: 800; font-size: 1rem; color: #38bdf8; display: block; }
+        .stat-item .lbl { font-size: 0.68rem; color: #94a3b8; text-transform: uppercase; font-weight: 600; }
+
+        .lang-switcher {
+            display: flex; background: rgba(0,0,0,0.3); padding: 3px;
+            border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .lang-btn {
+            background: transparent; border: none; color: #94a3b8; padding: 0.4rem 0.7rem;
+            font-weight: 700; font-size: 0.8rem; border-radius: 6px; cursor: pointer; transition: all 0.2s;
+        }
+
+        .lang-btn.active { background: var(--accent-bike); color: white; }
+
+        /* MAIN APP LAYOUT */
+        .app-layout {
+            max-width: 1800px; margin: 1.25rem auto; padding: 0 1.25rem;
+            display: grid; grid-template-columns: 380px 1fr; gap: 1.25rem;
+            height: calc(100vh - 130px); min-height: 650px;
+        }
+
+        /* SIDEBAR PANEL */
+        .sidebar {
+            background: var(--card-bg); border-radius: var(--radius-lg);
+            border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        .sidebar-header { padding: 1.2rem; border-bottom: 1px solid var(--border); background: #f8fafc; }
+
+        .status-badge {
+            font-size: 0.82rem; padding: 0.65rem 0.85rem; border-radius: var(--radius-md);
+            background: #e2e8f0; color: var(--text-main); font-weight: 600;
+            display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem;
+        }
+
+        .status-badge.loading { background: #e0f2fe; color: #0369a1; }
+        .status-badge.success { background: #dcfce7; color: #15803d; }
+        .status-badge.error { background: #fee2e2; color: #b91c1c; }
+
+        .search-box { position: relative; margin-bottom: 0.8rem; }
+        .search-box input {
+            width: 100%; padding: 0.7rem 1rem 0.7rem 2.4rem; border: 1px solid var(--border);
+            border-radius: var(--radius-md); font-size: 0.88rem; outline: none; transition: border 0.2s;
+        }
+        .search-box input:focus { border-color: var(--primary); }
+        .search-box i { position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+        .filter-pills { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.4rem; }
+        .pill-btn {
+            padding: 0.55rem 0.75rem; border: 1px solid var(--border); background: white;
+            border-radius: 8px; font-weight: 700; font-size: 0.78rem; color: var(--text-muted);
+            cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s;
+        }
+        .pill-btn:hover { background: #f1f5f9; color: var(--text-main); }
+        .pill-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .catalog-container { flex-grow: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+        .catalog-container::-webkit-scrollbar { width: 5px; }
+        .catalog-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
         /* ROUTE CARD */
         .route-card {
-            background: #ffffff;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            background: white; border: 1px solid var(--border); border-radius: var(--radius-md);
+            padding: 0.9rem; cursor: pointer; transition: all 0.2s; position: relative;
         }
-        
-        .route-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); border-color: #94a3b8; }
-        .route-card.active-card { border: 2px solid var(--accent-hike); box-shadow: var(--shadow-sm); }
-        
-        .route-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
-        .route-name { font-weight: 700; font-size: 0.95rem; line-height: 1.3; }
-        
-        .badge {
-            font-size: 0.7rem; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 4px; text-transform: uppercase; color: white;
-        }
-        .badge.bike { background: var(--accent-bike); }
-        .badge.hike { background: var(--accent-hike); }
-        .badge.single { background: var(--accent-single); }
-        
-        .route-meta { font-size: 0.8rem; color: #64748b; display: flex; gap: 1rem; margin-top: 0.5rem; }
-        .route-meta span { display: flex; align-items: center; gap: 0.3rem; }
+        .route-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+        .route-card.selected { border: 2px solid var(--accent-hike); background: #f0f9ff; }
 
-        /* MAP AREA */
-        .map-container {
-            background: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 90vh; /* Zaplní 90% výšky okna */
+        .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.4rem; }
+        .card-title { font-weight: 700; font-size: 0.9rem; color: var(--primary); line-height: 1.3; }
+        
+        .type-tag {
+            font-size: 0.65rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 20px;
+            text-transform: uppercase; color: white; white-space: nowrap;
+        }
+        .type-tag.bike { background: var(--accent-bike); }
+        .type-tag.hike { background: var(--accent-hike); }
+        .type-tag.single { background: var(--accent-single); }
+
+        .card-details { display: flex; gap: 1rem; font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-top: 0.4rem; }
+        .card-details span { display: flex; align-items: center; gap: 0.3rem; }
+
+        /* MAP CONTAINER */
+        .map-view {
+            background: var(--card-bg); border-radius: var(--radius-lg);
+            border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+            overflow: hidden; position: relative; display: flex; flex-direction: column;
         }
 
-        #map { width: 100%; flex-grow: 1; z-index: 1; }
+        #map { width: 100%; height: 100%; z-index: 1; }
 
-        /* Vzhľad Popup-u priamo v mape */
-        .leaflet-popup-content-wrapper { border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .leaflet-popup-content { margin: 15px; font-family: 'Inter'; }
-        .popup-title { font-weight: 800; font-size: 1.1rem; color: #0f172a; margin-bottom: 5px; }
-        .popup-data { font-size: 0.85rem; color: #475569; margin-bottom: 10px; }
+        /* MOBILE VIEW TOGGLER */
+        .mobile-tabs { display: none; background: white; border-top: 1px solid var(--border); }
+        .mobile-tab-btn {
+            flex: 1; padding: 0.8rem; border: none; background: transparent; font-weight: 700;
+            font-size: 0.9rem; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+        .mobile-tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
+
+        /* POPUP CUSTOM STYLING */
+        .leaflet-popup-content-wrapper { border-radius: 12px; padding: 4px; box-shadow: var(--shadow-lg); }
+        .popup-box { padding: 8px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .popup-box h4 { font-weight: 800; font-size: 1rem; color: var(--primary); margin-bottom: 6px; }
+        .popup-info { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4; }
+        .popup-btn {
+            background: var(--primary); color: white; border: none; padding: 0.5rem 0.8rem;
+            border-radius: 6px; font-weight: 700; font-size: 0.75rem; width: 100%; cursor: pointer;
+        }
 
         @media (max-width: 1024px) {
-            .dashboard { grid-template-columns: 1fr; }
-            .panel { max-height: 500px; position: static; }
-            .map-container { height: 70vh; }
+            .app-layout { grid-template-columns: 1fr; height: auto; }
+            .sidebar { height: 500px; display: none; }
+            .sidebar.active-view { display: flex; }
+            .map-view { height: 65vh; min-height: 450px; display: none; }
+            .map-view.active-view { display: flex; }
+            .mobile-tabs { display: flex; position: sticky; bottom: 0; z-index: 1000; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Geoportál Okresu Bardejov PRO</h1>
-        <p>Ultra-presné trasovanie generované priamo z geometrických uzlov OpenStreetMap (bez "náhodných čiar"). Mapové podklady Mapy.cz, CyclOSM a Kataster.</p>
+        <div class="header-container">
+            <div class="brand-box">
+                <div class="brand-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                <div class="brand-text">
+                    <h1 data-i18n="app_title">Bardejov GIS Geoportál</h1>
+                    <p data-i18n="app_subtitle">Kompletná sieť cyklotrás, turistiky, katastra a satelitných snímok</p>
+                </div>
+            </div>
+
+            <div class="top-controls">
+                <div class="stats-ticker">
+                    <div class="stat-item">
+                        <span class="val" id="statCount">0</span>
+                        <span class="lbl" data-i18n="stat_routes">Trás</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="val" id="statKm">0 km</span>
+                        <span class="lbl" data-i18n="stat_distance">Celkovo km</span>
+                    </div>
+                </div>
+
+                <div class="lang-switcher">
+                    <button class="lang-btn active" onclick="switchLanguage('sk')">SK</button>
+                    <button class="lang-btn" onclick="switchLanguage('en')">EN</button>
+                    <button class="lang-btn" onclick="switchLanguage('pl')">PL</button>
+                    <button class="lang-btn" onclick="switchLanguage('de')">DE</button>
+                </div>
+            </div>
+        </div>
     </header>
 
-    <div class="dashboard">
+    <div class="app-layout">
         
-        <!-- Bočný Panel s Katalógom a Filtrom -->
-        <aside class="panel">
-            <h2 class="panel-title"><i class="fa-solid fa-server"></i> Stav pripojenia</h2>
-            <div id="loadingStatus" class="loading-box">
-                <i class="fa-solid fa-circle-notch fa-spin"></i> Sťahujem presnú geometriu...
+        <!-- SIDEBAR KATALÓG -->
+        <aside class="sidebar active-view" id="sidebarView">
+            <div class="sidebar-header">
+                <div id="statusBadge" class="status-badge loading">
+                    <i class="fa-solid fa-spinner fa-spin"></i> <span data-i18n="status_loading">Načítavam GIS geodáta...</span>
+                </div>
+
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" oninput="filterAndRender()" data-i18n-ph="search_placeholder" placeholder="Hľadať trasu, lokalitu alebo povrch...">
+                </div>
+
+                <div class="filter-pills">
+                    <button class="pill-btn active" onclick="setCategory('all', this)">
+                        <span data-i18n="filter_all">Všetky</span> <i class="fa-solid fa-layer-group"></i>
+                    </button>
+                    <button class="pill-btn" onclick="setCategory('bike', this)">
+                        <span data-i18n="filter_bike">Cyklotrasy</span> <i class="fa-solid fa-person-biking" style="color:var(--accent-bike)"></i>
+                    </button>
+                    <button class="pill-btn" onclick="setCategory('hike', this)">
+                        <span data-i18n="filter_hike">Turistika</span> <i class="fa-solid fa-person-hiking" style="color:var(--accent-hike)"></i>
+                    </button>
+                    <button class="pill-btn" onclick="setCategory('single', this)">
+                        <span data-i18n="filter_single">MTB Traily</span> <i class="fa-solid fa-mountain" style="color:var(--accent-single)"></i>
+                    </button>
+                </div>
             </div>
 
-            <h2 class="panel-title"><i class="fa-solid fa-filter"></i> Vrstvy trás</h2>
-            <div class="filter-group">
-                <button class="btn-filter active" onclick="applyFilter('all', this)">
-                    <span>Zobraziť všetky</span> <i class="fa-solid fa-layer-group"></i>
-                </button>
-                <button class="btn-filter" onclick="applyFilter('bike', this)">
-                    <span>Cyklotrasy & Cesty</span> <i class="fa-solid fa-person-biking" style="color: var(--accent-bike)"></i>
-                </button>
-                <button class="btn-filter" onclick="applyFilter('hike', this)">
-                    <span>Turistické chodníky</span> <i class="fa-solid fa-person-hiking" style="color: var(--accent-hike)"></i>
-                </button>
-                <button class="btn-filter" onclick="applyFilter('single', this)">
-                    <span>MTB & Singletracky</span> <i class="fa-solid fa-mountain" style="color: var(--accent-single)"></i>
-                </button>
-            </div>
-
-            <h2 class="panel-title"><i class="fa-solid fa-list"></i> Katalóg trás (<span id="routeCount">0</span>)</h2>
-            <div id="catalog" class="catalog-scroll">
-                <!-- Karty sa generujú dynamicky cez JS -->
-            </div>
+            <div class="catalog-container" id="catalogList"></div>
         </aside>
 
-        <!-- Hlavná Mapa -->
-        <main class="map-container">
+        <!-- MAPA -->
+        <main class="map-view active-view" id="mapView">
             <div id="map"></div>
         </main>
 
     </div>
 
-    <!-- Leaflet JS -->
+    <!-- PREPÍNAČ PRE MOBILNÉ ZARIADENIA -->
+    <div class="mobile-tabs">
+        <button class="mobile-tab-btn active" onclick="switchMobileTab('mapView', this)">
+            <i class="fa-solid fa-map"></i> <span data-i18n="tab_map">Mapa</span>
+        </button>
+        <button class="mobile-tab-btn" onclick="switchMobileTab('sidebarView', this)">
+            <i class="fa-solid fa-list"></i> <span data-i18n="tab_list">Zoznam trás</span>
+        </button>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // --- 1. INICIALIZÁCIA MAPY ---
-        const map = L.map('map').setView([49.29356, 21.25091], 12);
+        // --- 1. MULTILINGUAL DICTIONARY (SK, EN, PL, DE) ---
+        const i18n = {
+            sk: {
+                app_title: "Bardejov GIS Geoportál",
+                app_subtitle: "Kompletná sieť cyklotrás, turistiky, katastra a satelitných snímok",
+                stat_routes: "Trás",
+                stat_distance: "Celkovo km",
+                status_loading: "Stahujem exaktnú geometriu zo serverov...",
+                status_success: "Načítaných {count} trás z okresu Bardejov",
+                status_error: "Chyba pripojenia. Načítaná záložná databáza.",
+                search_placeholder: "Hľadať trasu, lokalitu, povrch...",
+                filter_all: "Všetky",
+                filter_bike: "Cyklotrasy",
+                filter_hike: "Turistika",
+                filter_single: "MTB Traily",
+                tab_map: "Mapa",
+                tab_list: "Zoznam trás",
+                meta_length: "Dĺžka",
+                meta_surface: "Povrch",
+                btn_focus: "Zobraziť v mape",
+                popup_length: "Dĺžka úseku",
+                popup_surface: "Povrch",
+                popup_type: "Kategória",
+                type_bike: "Cyklotrasa",
+                type_hike: "Turistika",
+                type_single: "MTB Trail",
+                no_results: "Žiadne trasy nezodpovedajú vyhľadávaniu.",
+                layer_mapycz: "🥾 Mapy.cz Turistická",
+                layer_cyclosm: "🚴 CyclOSM Cyklomapa",
+                layer_google_sat: "🛰️ Google Satelitná",
+                layer_google_hyb: "🏙️ Google Hybridná",
+                layer_osm: "🗺️ OpenStreetMap Štandard",
+                layer_kataster: "📐 Kataster / Topo ZBGIS"
+            },
+            en: {
+                app_title: "Bardejov GIS Geoportal",
+                app_subtitle: "Complete network of cycle paths, hiking trails, cadastral & satellite maps",
+                stat_routes: "Routes",
+                stat_distance: "Total km",
+                status_loading: "Downloading exact geometry from GIS servers...",
+                status_success: "Loaded {count} real routes in Bardejov district",
+                status_error: "Connection error. Backup dataset loaded.",
+                search_placeholder: "Search route, location, surface...",
+                filter_all: "All",
+                filter_bike: "Cycling",
+                filter_hike: "Hiking",
+                filter_single: "MTB Trails",
+                tab_map: "Map",
+                tab_list: "Route List",
+                meta_length: "Length",
+                meta_surface: "Surface",
+                btn_focus: "Show on map",
+                popup_length: "Section length",
+                popup_surface: "Surface type",
+                popup_type: "Category",
+                type_bike: "Cycleway",
+                type_hike: "Hiking Trail",
+                type_single: "MTB Trail",
+                no_results: "No routes match your search.",
+                layer_mapycz: "🥾 Mapy.cz Outdoor",
+                layer_cyclosm: "🚴 CyclOSM Cycle Map",
+                layer_google_sat: "🛰️ Google Satellite",
+                layer_google_hyb: "🏙️ Google Hybrid",
+                layer_osm: "🗺️ OpenStreetMap Standard",
+                layer_kataster: "📐 Cadastral / Topo ZBGIS"
+            },
+            pl: {
+                app_title: "Bardejów GIS Geoportál",
+                app_subtitle: "Kompletna sieć ścieżek rowerowych, pieszych, katastru i satelity",
+                stat_routes: "Trasy",
+                stat_distance: "Łącznie km",
+                status_loading: "Pobieranie dokładnej geometrii z serwerów...",
+                status_success: "Załadowano {count} tras z powiatu Bardejów",
+                status_error: "Błąd połączenia. Załadowano dane zapasowe.",
+                search_placeholder: "Szukaj trasy, lokalizacji, nawierzchni...",
+                filter_all: "Wszystkie",
+                filter_bike: "Rowerowe",
+                filter_hike: "Turyzm",
+                filter_single: "MTB Traily",
+                tab_map: "Mapa",
+                tab_list: "Lista tras",
+                meta_length: "Długość",
+                meta_surface: "Nawierzchnia",
+                btn_focus: "Pokaż na mapie",
+                popup_length: "Długość odcinka",
+                popup_surface: "Nawierzchnia",
+                popup_type: "Kategoria",
+                type_bike: "Trasa rowerowa",
+                type_hike: "Szlak pieszy",
+                type_single: "MTB Trail",
+                no_results: "Brak tras spełniających kryteria.",
+                layer_mapycz: "🥾 Mapy.cz Turystyczna",
+                layer_cyclosm: "🚴 CyclOSM Rowerowa",
+                layer_google_sat: "🛰️ Google Satelita",
+                layer_google_hyb: "🏙️ Google Hybryda",
+                layer_osm: "🗺️ OpenStreetMap Standard",
+                layer_kataster: "📐 Kataster / Topo ZBGIS"
+            },
+            de: {
+                app_title: "Bardejov GIS Geoportal",
+                app_subtitle: "Vollständiges Netz von Radwegen, Wanderwegen, Kataster & Satellit",
+                stat_routes: "Routen",
+                stat_distance: "Gesamt km",
+                status_loading: "Lade exakte Geometrie von den Servern...",
+                status_success: "{count} Routen im Bezirk Bardejov geladen",
+                status_error: "Verbindungsfehler. Backup-Daten geladen.",
+                search_placeholder: "Route, Ort, Belag suchen...",
+                filter_all: "Alle",
+                filter_bike: "Radwege",
+                filter_hike: "Wandern",
+                filter_single: "MTB Trails",
+                tab_map: "Karte",
+                tab_list: "Routenliste",
+                meta_length: "Länge",
+                meta_surface: "Belag",
+                btn_focus: "Auf Karte zeigen",
+                popup_length: "Abschnittslänge",
+                popup_surface: "Oberfläche",
+                popup_type: "Kategorie",
+                type_bike: "Radweg",
+                type_hike: "Wanderweg",
+                type_single: "MTB Trail",
+                no_results: "Keine Routen gefunden.",
+                layer_mapycz: "🥾 Mapy.cz Outdoor",
+                layer_cyclosm: "🚴 CyclOSM Radkarte",
+                layer_google_sat: "🛰️ Google Satellit",
+                layer_google_hyb: "🏙️ Google Hybrid",
+                layer_osm: "🗺️ OpenStreetMap Standard",
+                layer_kataster: "📐 Kataster / Topo ZBGIS"
+            }
+        };
 
-        // Mapové podklady najvyššej kvality
-        const mapyCzOutdoor = L.tileLayer('https://m{s}.mapserver.mapy.cz/turist-m/{z}-{x}-{y}', {
-            subdomains: '1234', maxZoom: 19, attribution: '&copy; Mapy.cz / Seznam.cz'
-        });
+        let currentLang = 'sk';
 
-        const cykloOsm = L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', {
-            maxZoom: 20, attribution: '&copy; CyclOSM & OSM'
-        });
+        function t(key, vars = {}) {
+            let str = i18n[currentLang][key] || key;
+            for (let k in vars) { str = str.replace(`{${k}}`, vars[k]); }
+            return str;
+        }
 
-        const googleSat = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-            maxZoom: 20, attribution: '&copy; Google Maps'
-        });
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
 
-        const katasterTopo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 19, attribution: '&copy; ZBGIS / Esri Topo'
-        });
+            // Translate static elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const k = el.getAttribute('data-i18n');
+                if (i18n[lang][k]) el.innerText = i18n[lang][k];
+            });
 
-        // Predvolená vrstva Mapy.cz (najlepšie pre Slovensko a turistiku)
-        mapyCzOutdoor.addTo(map);
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                const k = el.getAttribute('data-i18n-ph');
+                if (i18n[lang][k]) el.placeholder = i18n[lang][k];
+            });
 
-        L.control.layers({
-            "🥾 Mapy.cz Turistická": mapyCzOutdoor,
-            "🚴 OSM Cyklomapa (CyclOSM)": cykloOsm,
-            "🛰️ Google Satelit": googleSat,
-            "📐 Kataster / Topo": katasterTopo
-        }, null, { position: 'topright' }).addTo(map);
+            // Update Map Layer Control Names dynamically
+            updateLayerControlNames();
 
-        // --- 2. GLOBÁLNE PREMENNÉ ---
-        let allRoutes = [];
-        let mapLayerGroup = L.featureGroup().addTo(map); // Umožňuje centovať mapu na všetky prvky
-        let activeFilterType = 'all';
-        let highlightedLayer = null;
-
-        // --- 3. SŤAHOVANIE DÁT Z OVERPASS API (out geom;) ---
-        // 'out geom' zaručuje, že dostaneme presné pole súradníc každej cesty, eliminuje random čiary!
-        async function fetchProfessionalGeodata() {
-            const statusBox = document.getElementById('loadingStatus');
-            const bbox = "49.15,21.05,49.45,21.45"; // Región Bardejova
-
-            const query = `
-                [out:json][timeout:50];
-                (
-                  relation["route"="bicycle"](${bbox});
-                  relation["route"="hiking"](${bbox});
-                  relation["route"="foot"](${bbox});
-                  relation["route"="mtb"](${bbox});
-                  way["highway"="cycleway"](${bbox});
-                  way["highway"="path"]["bicycle"="designated"](${bbox});
-                  way["mtb:scale"](${bbox});
-                );
-                out body geom; 
-            `; // KÚZLO JE V "out body geom;". To vráti presný tvar ciest, nielen ID bodov.
-
-            try {
-                const response = await fetch("https://overpass-api.de/api/interpreter", {
-                    method: "POST", body: "data=" + encodeURIComponent(query)
-                });
-                
-                if (!response.ok) throw new Error("API preťažené, skúste o chvíľu.");
-                const data = await response.json();
-                
-                processOSMData(data.elements);
-                
-                statusBox.className = 'loading-box success';
-                statusBox.innerHTML = `<i class="fa-solid fa-check-circle"></i> Úspešne načítaných ${allRoutes.length} presných trás`;
-                
-                renderData();
-
-            } catch (error) {
-                console.error(error);
-                statusBox.className = 'loading-box error';
-                statusBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Nastala chyba pripojenia.`;
+            // Re-render Data
+            if (rawRoutesData.length > 0) {
+                updateStatusBadge('success');
+                filterAndRender();
             }
         }
 
-        // --- 4. SPRACOVANIE GEOMETRIE DO MULTI-LÍNIÍ ---
-        function processOSMData(elements) {
-            let routeCounter = 1;
+        // --- 2. MAP INITIALIZATION & TILE LAYERS ---
+        const map = L.map('map', { zoomControl: false }).setView([49.29356, 21.25091], 12);
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        const layers = {
+            mapycz: L.tileLayer('https://m{s}.mapserver.mapy.cz/turist-m/{z}-{x}-{y}', { subdomains: '1234', maxZoom: 19, attribution: '&copy; Mapy.cz' }),
+            cyclosm: L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', { maxZoom: 20, attribution: '&copy; CyclOSM' }),
+            googleSat: L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '&copy; Google' }),
+            googleHyb: L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '&copy; Google' }),
+            osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }),
+            kataster: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: '&copy; ZBGIS' })
+        };
+
+        layers.mapycz.addTo(map);
+
+        let layerControl = L.control.layers({}, null, { position: 'topright' }).addTo(map);
+
+        function updateLayerControlNames() {
+            // Remove previous base layers
+            Object.values(layers).forEach(l => layerControl.removeLayer(l));
+            
+            // Re-add with localized titles
+            layerControl.addBaseLayer(layers.mapycz, t('layer_mapycz'));
+            layerControl.addBaseLayer(layers.cyclosm, t('layer_cyclosm'));
+            layerControl.addBaseLayer(layers.googleSat, t('layer_google_sat'));
+            layerControl.addBaseLayer(layers.googleHyb, t('layer_google_hyb'));
+            layerControl.addBaseLayer(layers.osm, t('layer_osm'));
+            layerControl.addBaseLayer(layers.kataster, t('layer_kataster'));
+        }
+
+        updateLayerControlNames();
+
+        // --- 3. OVERPASS API DATA FETCHING ---
+        let rawRoutesData = [];
+        let activeCategory = 'all';
+        let polylineLayerGroup = L.featureGroup().addTo(map);
+        let activePolyline = null;
+
+        async function loadDistrictRoutes() {
+            updateStatusBadge('loading');
+
+            // Bounding box: Okres Bardejov + Čergov + Busov + Pohraničie
+            const bbox = "49.08,20.95,49.52,21.60";
+
+            const overpassQuery = `
+                [out:json][timeout:60];
+                (
+                  relation["route"~"bicycle|hiking|foot|mtb"](${bbox});
+                  way["highway"="cycleway"](${bbox});
+                  way["highway"~"path|track"]["bicycle"="designated"](${bbox});
+                  way["mtb:scale"](${bbox});
+                );
+                out body geom;
+            `;
+
+            try {
+                const response = await fetch("https://overpass-api.de/api/interpreter", {
+                    method: "POST",
+                    body: "data=" + encodeURIComponent(overpassQuery)
+                });
+
+                if(!response.ok) throw new Error("Server timeout");
+                const json = await response.json();
+
+                parseGeomData(json.elements);
+                updateStatusBadge('success');
+                filterAndRender();
+
+            } catch (e) {
+                console.warn("Chyba API, načítavam lokálnu záložnú databázu", e);
+                updateStatusBadge('error');
+                loadBackupRoutes();
+            }
+        }
+
+        function parseGeomData(elements) {
+            let idCounter = 1;
 
             elements.forEach(el => {
-                let tags = el.tags || {};
-                
-                // Zistenie kategórie trasy
+                const tags = el.tags || {};
                 let category = 'hike';
+
                 if (tags.route === 'bicycle' || tags.highway === 'cycleway' || tags.bicycle === 'designated') {
                     category = 'bike';
                 } else if (tags['mtb:scale'] || tags.route === 'mtb') {
                     category = 'single';
                 }
 
-                // Extrakcia presnej geometrie (polia vo vnútri polí)
-                let multiCoords = [];
-                
+                let coordsList = [];
+
                 if (el.type === 'relation' && el.members) {
                     el.members.forEach(m => {
                         if (m.type === 'way' && m.geometry) {
-                            multiCoords.push(m.geometry.map(pt => [pt.lat, pt.lon]));
+                            coordsList.push(m.geometry.map(pt => [pt.lat, pt.lon]));
                         }
                     });
                 } else if (el.type === 'way' && el.geometry) {
-                    multiCoords.push(el.geometry.map(pt => [pt.lat, pt.lon]));
+                    coordsList.push(el.geometry.map(pt => [pt.lat, pt.lon]));
                 }
 
-                if (multiCoords.length > 0) {
-                    // Výpočet dĺžky
-                    let lengthMeters = 0;
-                    multiCoords.forEach(segment => {
-                        for(let i = 0; i < segment.length - 1; i++) {
-                            lengthMeters += map.distance(segment[i], segment[i+1]);
+                if (coordsList.length > 0) {
+                    let totalMeters = 0;
+                    coordsList.forEach(seg => {
+                        for(let i=0; i<seg.length-1; i++) {
+                            totalMeters += map.distance(seg[i], seg[i+1]);
                         }
                     });
 
-                    // Ak je trasa dlhšia ako 300 metrov, uložíme ju
-                    if (lengthMeters > 300) {
-                        let defaultName = category === 'bike' ? 'Cykloúsek' : (category === 'single' ? 'MTB Trail' : 'Turistický chodník');
+                    if (totalMeters > 250) {
+                        let routeName = tags.name || tags.ref || `${t('type_' + category)} #${idCounter++}`;
                         
-                        allRoutes.push({
-                            id: `gis-${el.id}`,
-                            name: tags.name || tags.ref || `${defaultName} #${routeCounter++}`,
+                        rawRoutesData.push({
+                            id: `route-${el.id}`,
+                            name: routeName,
                             category: category,
-                            lengthKm: (lengthMeters / 1000).toFixed(1),
-                            surface: tags.surface || 'Neznámy',
-                            coords: multiCoords // Toto je kľúčové! Je to Pole polí (MultiPolyline). Presne lícuje cestu.
+                            lengthKm: (totalMeters / 1000).toFixed(1),
+                            surface: tags.surface || (category === 'bike' ? 'asphalt' : 'unpaved'),
+                            coords: coordsList
                         });
                     }
                 }
             });
 
-            // Zoradenie podľa dĺžky (najdlhšie prvé)
-            allRoutes.sort((a, b) => b.lengthKm - a.lengthKm);
+            rawRoutesData.sort((a,b) => b.lengthKm - a.lengthKm);
         }
 
-        // --- 5. VYKRESLENIE DO MAPY A KATALÓGU ---
-        function renderData() {
-            mapLayerGroup.clearLayers();
-            const catalog = document.getElementById('catalog');
+        function loadBackupRoutes() {
+            rawRoutesData = [
+                { id: "b1", name: "Cyklochodník Bardejov - Bardejovské Kúpele", category: "bike", lengthKm: "5.2", surface: "asphalt", coords: [[[49.2917, 21.2727], [49.2965, 21.2750], [49.3031, 21.2801], [49.3105, 21.2825], [49.3180, 21.2780], [49.3245, 21.2720]]] },
+                { id: "b2", name: "Cyklotrasa Bardejov - Hervartov UNESCO", category: "bike", lengthKm: "10.8", surface: "asphalt", coords: [[[49.2917, 21.2727], [49.2810, 21.2610], [49.2705, 21.2480], [49.2600, 21.2330], [49.2480, 21.2060]]] },
+                { id: "b3", name: "Rodinný Singletrack Cyklostopy", category: "single", lengthKm: "3.1", surface: "dirt", coords: [[[49.3250, 21.2720], [49.3275, 21.2680], [49.3301, 21.2650], [49.3315, 21.2690], [49.3280, 21.2730]]] },
+                { id: "b4", name: "Čergovský Singletrack Enduro", category: "single", lengthKm: "4.5", surface: "dirt/gravel", coords: [[[49.3280, 21.2600], [49.3320, 21.2540], [49.3360, 21.2480], [49.3390, 21.2520]]] },
+                { id: "b5", name: "Turistika Hervartov - Rozhľadňa Žobrák", category: "hike", lengthKm: "8.2", surface: "ground", coords: [[[49.2480, 21.2060], [49.2390, 21.1920], [49.2310, 21.1750], [49.2220, 21.1590], [49.2155, 21.1460]]] },
+                { id: "b6", name: "Kúpeľný chodník Bardejovské Kúpele - Zborovský Hrad", category: "hike", lengthKm: "9.5", surface: "gravel", coords: [[[49.3250, 21.2720], [49.3380, 21.2850], [49.3480, 21.2980], [49.3540, 21.3060]]] }
+            ];
+            filterAndRender();
+        }
+
+        // --- 4. FILTERING & RENDERING ENGINE ---
+        function filterAndRender() {
+            polylineLayerGroup.clearLayers();
+            const catalog = document.getElementById('catalogList');
             catalog.innerHTML = '';
+
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             let visibleCount = 0;
+            let sumKm = 0;
 
-            allRoutes.forEach(route => {
-                if (activeFilterType === 'all' || route.category === activeFilterType) {
+            rawRoutesData.forEach(route => {
+                const matchesCat = activeCategory === 'all' || route.category === activeCategory;
+                const matchesSearch = route.name.toLowerCase().includes(searchTerm) || route.surface.toLowerCase().includes(searchTerm);
+
+                if (matchesCat && matchesSearch) {
                     visibleCount++;
+                    sumKm += parseFloat(route.lengthKm);
 
-                    // Farby podľa kategórie
-                    let routeColor = route.category === 'bike' ? '#10b981' : (route.category === 'single' ? '#f59e0b' : '#3b82f6');
-                    
-                    // L.polyline spracuje pole polí automaticky ako viacnásobnú lomenú čiaru (MultiPolyline)
-                    let polyline = L.polyline(route.coords, {
-                        color: routeColor,
-                        weight: 5,
-                        opacity: 0.8,
-                        lineCap: 'round',
-                        lineJoin: 'round'
+                    // Polyline styling
+                    const strokeColor = route.category === 'bike' ? '#10b981' : (route.category === 'single' ? '#f59e0b' : '#3b82f6');
+
+                    const polyline = L.polyline(route.coords, {
+                        color: strokeColor,
+                        weight: 4,
+                        opacity: 0.85,
+                        lineCap: 'round'
                     });
 
-                    // Interaktivita v mape
                     polyline.bindPopup(`
-                        <div class="popup-title">${route.name}</div>
-                        <div class="popup-data">
-                            <b>Dĺžka:</b> ${route.lengthKm} km<br>
-                            <b>Povrch:</b> ${route.surface}<br>
-                            <b>Typ:</b> ${route.category.toUpperCase()}
+                        <div class="popup-box">
+                            <h4>${route.name}</h4>
+                            <div class="popup-info">
+                                <b>${t('popup_length')}:</b> ${route.lengthKm} km<br>
+                                <b>${t('popup_surface')}:</b> ${route.surface}<br>
+                                <b>${t('popup_type')}:</b> ${t('type_' + route.category)}
+                            </div>
+                            <button class="popup-btn" onclick="focusRouteCard('${route.id}')">${t('btn_focus')}</button>
                         </div>
                     `);
 
-                    polyline.on('mouseover', function() { this.setStyle({ weight: 8, opacity: 1 }); });
-                    polyline.on('mouseout', function() { 
-                        if(highlightedLayer !== this) this.setStyle({ weight: 5, opacity: 0.8 }); 
-                    });
+                    polyline.on('click', () => highlightSelected(route.id, polyline));
 
-                    polyline.on('click', () => { activateCard(route.id, polyline); });
+                    polylineLayerGroup.addLayer(polyline);
 
-                    mapLayerGroup.addLayer(polyline);
-
-                    // Vytvorenie karty v katalógu
+                    // Render Card
                     const card = document.createElement('div');
-                    card.className = `route-card`;
+                    card.className = 'route-card';
                     card.id = `card-${route.id}`;
                     card.innerHTML = `
-                        <div class="route-header">
-                            <span class="route-name">${route.name}</span>
-                            <span class="badge ${route.category}">${route.category}</span>
+                        <div class="card-top">
+                            <span class="card-title">${route.name}</span>
+                            <span class="type-tag ${route.category}">${t('type_' + route.category)}</span>
                         </div>
-                        <div class="route-meta">
+                        <div class="card-details">
                             <span><i class="fa-solid fa-ruler"></i> ${route.lengthKm} km</span>
                             <span><i class="fa-solid fa-road"></i> ${route.surface}</span>
                         </div>
@@ -413,49 +643,83 @@
                     card.onclick = () => {
                         map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
                         polyline.openPopup();
-                        activateCard(route.id, polyline);
+                        highlightSelected(route.id, polyline);
+                        
+                        // Swiping to map view on mobile
+                        if(window.innerWidth <= 1024) {
+                            switchMobileTab('mapView', document.querySelectorAll('.mobile-tab-btn')[0]);
+                        }
                     };
 
                     catalog.appendChild(card);
                 }
             });
 
-            document.getElementById('routeCount').innerText = visibleCount;
-            
-            // Po prvom načítaní centrovat mapu na všetky nájdené trasy
-            if (mapLayerGroup.getLayers().length > 0) {
-                map.fitBounds(mapLayerGroup.getBounds());
+            document.getElementById('statCount').innerText = visibleCount;
+            document.getElementById('statKm').innerText = `${sumKm.toFixed(0)} km`;
+
+            if (visibleCount === 0) {
+                catalog.innerHTML = `<p style="padding:1rem; color:var(--text-muted); font-size:0.85rem; text-align:center;">${t('no_results')}</p>`;
+            }
+
+            if (polylineLayerGroup.getLayers().length > 0) {
+                map.fitBounds(polylineLayerGroup.getBounds());
             }
         }
 
-        // --- 6. POMOCNÉ FUNKCIE (Filtre a Zvýraznenie) ---
-        function applyFilter(type, btnElement) {
-            activeFilterType = type;
-            document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
-            btnElement.classList.add('active');
-            renderData();
-        }
-
-        function activateCard(routeId, layer) {
-            // Reset štýlov mapy
-            mapLayerGroup.eachLayer(l => l.setStyle({ weight: 5, opacity: 0.8, color: l.options.color }));
+        function highlightSelected(routeId, polyline) {
+            polylineLayerGroup.eachLayer(layer => layer.setStyle({ weight: 4, opacity: 0.85, color: layer.options.color }));
             
-            // Zvýraznenie kliknutej čiary
-            layer.setStyle({ weight: 8, opacity: 1, color: '#ef4444' }); // Červená pre aktívnu
-            highlightedLayer = layer;
-            layer.bringToFront();
+            polyline.setStyle({ weight: 8, opacity: 1, color: '#ef4444' });
+            polyline.bringToFront();
 
-            // Reset a nastavenie kariet
-            document.querySelectorAll('.route-card').forEach(c => c.classList.remove('active-card'));
-            const activeCard = document.getElementById(`card-${routeId}`);
-            if (activeCard) {
-                activeCard.classList.add('active-card');
-                activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            document.querySelectorAll('.route-card').forEach(c => c.classList.remove('selected'));
+            const card = document.getElementById(`card-${routeId}`);
+            if (card) {
+                card.classList.add('selected');
+                card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
         }
 
-        // Štart aplikácie
-        fetchProfessionalGeodata();
+        function setCategory(cat, btn) {
+            activeCategory = cat;
+            document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterAndRender();
+        }
+
+        function updateStatusBadge(status) {
+            const badge = document.getElementById('statusBadge');
+            if (status === 'loading') {
+                badge.className = 'status-badge loading';
+                badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${t('status_loading')}`;
+            } else if (status === 'success') {
+                badge.className = 'status-badge success';
+                badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${t('status_success', { count: rawRoutesData.length })}`;
+            } else {
+                badge.className = 'status-badge error';
+                badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${t('status_error')}`;
+            }
+        }
+
+        function switchMobileTab(viewId, btn) {
+            document.querySelectorAll('.mobile-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            document.getElementById('sidebarView').classList.remove('active-view');
+            document.getElementById('mapView').classList.remove('active-view');
+            
+            document.getElementById(viewId).classList.add('active-view');
+            if (viewId === 'mapView') map.invalidateSize();
+        }
+
+        function focusRouteCard(id) {
+            const card = document.getElementById(`card-${id}`);
+            if(card) card.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize App Data
+        loadDistrictRoutes();
     </script>
 </body>
 </html>
